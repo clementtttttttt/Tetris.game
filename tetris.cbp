@@ -31,13 +31,17 @@
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="`sdl2-config --cflags`" />
 			<Add option="-Wall" />
+			<Add option="`sdl2-config --cflags`" />
 		</Compiler>
 		<Linker>
 			<Add option="`sdl2-config --libs`" />
+			<Add option="`pkg-config SDL2_mixer --libs`" />
+			<Add option="`pkg-config SDL2_ttf --libs`" />
 		</Linker>
 		<Unit filename="main.cpp" />
+		<Unit filename="notes.cpp" />
+		<Unit filename="notes.hpp" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

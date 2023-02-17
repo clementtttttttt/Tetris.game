@@ -336,6 +336,8 @@ struct songnote theme[][4]{
 
 #undef TEMPO
 
+struct songnote (*curr_song)[][4];
+
 int curr_rows[4]={0,0,0,0};
 
 int piece_or = 1, old_piece_or = 1;
@@ -344,8 +346,9 @@ int lines = 0;
 
 int goal;
 
-int next_piece = rand()%7+1, curr_piece;
+int curr_piece;
 
+std::deque<int> te_bag;
 
 class InitError : public std::exception
 {
@@ -399,6 +402,10 @@ SDL::SDL( Uint32 flags )
         throw InitError();
 
     Mix_OpenAudio(48000,AUDIO_S16LSB,2,256);
+    Uint16 format;
+    int channels;
+    extern int sfreq;
+    Mix_QuerySpec(&sfreq, &format, &channels);
 
     Mix_AllocateChannels(5);
             SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
@@ -431,9 +438,9 @@ TTF_Font *font;
 
 std::queue<struct songnote> s_eff_queue[4];
 
-void s_beep(float len_ims, unsigned int freq,float len_ims2=0,unsigned int freq2=0,float len_ims3=0,unsigned int freq3=0,float len_ims4=0,unsigned int freq4=0){
+void s_beep(float len_ims, unsigned int freq,unsigned int channel=0,double vol = 0.5){
 
-    s_eff_queue[0].push(DSN(SQR,freq, (unsigned int)(len_ims/1000*60), 50, 0.5));
+    s_eff_queue[channel].push(DSN(SQR,freq, (unsigned int)(len_ims/1000*60), 50, vol));
 
 }
 int clearing=0;
@@ -492,8 +499,18 @@ void f_update(){
 
 }
 
+int stop_music = 0;
 
 void drawText ( SDL_Renderer* screen, char* str, int x, int y, int sz,SDL_Color fgC, SDL_Color bgC,int leftanchor) {
+
+    TTF_Init();
+
+    font = TTF_OpenFont("./font.ttf",30);
+        if(!font) {
+        printf("[ERROR] TTF_OpenFont() Failed with: %s\n", TTF_GetError());
+        exit(2);
+    }
+
 
 
     //SDL_Surface* textSurface = TTF_RenderText_Solid(font, string, fgC);     // aliased glyphs
@@ -505,7 +522,9 @@ void drawText ( SDL_Renderer* screen, char* str, int x, int y, int sz,SDL_Color 
 
     SDL_DestroyTexture(t);
     SDL_FreeSurface(textSurface);
+    TTF_CloseFont(font);
 
+    TTF_Quit();
     //printf("[ERROR] Unknown error in drawText(): %s\n", TTF_GetError()); return 1;
 }
 
@@ -521,6 +540,18 @@ SDL_Rect next_f_rects[] = {
 };
 
 int prevgoal=0;
+int gameover=0;
+
+int fillcounter = 23;
+
+void stopbgm(){
+    stop_music=1;
+    curr_rows[0] = 0;
+    curr_rows[1] = 0;
+    curr_rows[2] = 0;
+    curr_rows[3] = 0;
+    Mix_HaltChannel(-1);
+}
 
 void SDL::draw()
 {
@@ -537,7 +568,7 @@ void SDL::draw()
     int (*collm) [4][8];
 
 
-    switch(next_piece){
+    switch(te_bag.front()){
         case straight:
             collm = &coll_straight;
             break;
@@ -564,10 +595,10 @@ void SDL::draw()
 
 
     for(int x=0;x<4;++x){
-            if(next_piece == straight|| next_piece == square){
+            if(te_bag.front() == straight|| te_bag.front() == square){
                 stoff =13;
             }
-            SDL_SetRenderDrawColor(m_renderer,piece_colours[next_piece-1].r,piece_colours[next_piece-1].g,piece_colours[next_piece-1].b,piece_colours[next_piece-1].a);
+            SDL_SetRenderDrawColor(m_renderer,piece_colours[te_bag.front()-1].r,piece_colours[te_bag.front()-1].g,piece_colours[te_bag.front()-1].b,piece_colours[te_bag.front()-1].a);
             SDL_Rect bl_r = {stoff+40+2*26+((*collm)[0][x*2])*26,26+2*26-((*collm)[0][x*2+1])*26,26,26};
             SDL_RenderFillRect(m_renderer,&bl_r);
             SDL_SetRenderDrawColor(m_renderer,0,0,0,255);
@@ -626,7 +657,7 @@ void SDL::draw()
 
     drawText(m_renderer, "GOAL",  604,200,26,{0xff,0xff,0xff,0xff},{0,0,0,0},1);
 
-    sprintf(s,"%03d",goal-prevgoal);
+    sprintf(s,"%03d",goal-lines);
 
     drawText(m_renderer, s, 578,220,26,{0xff,0xff,0xff,0xff},{0,0,0,0},1);
 
@@ -686,6 +717,22 @@ void SDL::draw()
             px=5;
 
         }
+    }
+
+    if(gameover){
+        if(fillcounter){
+            --fillcounter;
+            for(int i=0;i<10;++i){
+                blocks[i][fillcounter] = {0x88,0x88,0x88,0xff};
+            }
+        }
+        else{
+               drawText(m_renderer, "GAME OVER", 0,0,52,{0xff,0xff,0xff,0xff},{0},0);
+                drawText(m_renderer, "PRESS R TO RETRY", 0,104,52,{0xff,0xff,0xff,0xff},{0},0);
+
+        }
+
+
     }
 
 
@@ -832,9 +879,34 @@ void ghost_tick(){
     }
 }
 
+void fill_te_bag(){
+    for(int i=0;i<7;++i){
+        int dupe;
+        int result;
+        do{
+            dupe=0;
+            result=rand()%7+1;
+            for(int i=0;i<te_bag.size();++i){
+                if(te_bag[i] == result){
+                    dupe|=1;
+                }
+            }
+        }while(dupe);
+        te_bag.push_back(result);
+    }
+
+}
+
 void piece_spawn(){
-    curr_piece = next_piece;
-    next_piece = rand()%7 + 1;
+    if(!te_bag.size()){
+        fill_te_bag();
+    }
+        curr_piece = te_bag.front();
+        te_bag.pop_front();
+    if(!te_bag.size()){
+        fill_te_bag();
+    }
+
     piece_or = old_piece_or = 1;
 
     if(curr_piece == straight) py = 22; else py = 22;
@@ -856,7 +928,15 @@ void piece_spawn(){
                     blocks2[x][y] = {0,0,0,0};
                 }
             }
-            movep(px,py,px,py);
+
+    if(chk_collision()){
+        gameover=1;
+            stopbgm();
+
+            return;
+    }
+
+    movep(px,py,px,py);
     ghost_tick();
 }
 
@@ -931,6 +1011,8 @@ void drop_tick(){
         if(chk_collision(0,-1)){
             spawn = 1;
                     movep(px,py,px,py);
+                                s_beep(100,C2,2,0.9);
+
             f_update();
             s_cancelled = 1;
 
@@ -987,7 +1069,7 @@ void audio_tick(){
 
     }
 
-
+    if(!stop_music){
     for(int i=0; i<4;++i){
         if(theme[curr_rows[i]][i].valid){
 
@@ -1030,6 +1112,8 @@ void audio_tick(){
         }
 
     }
+    }
+
 
 
 
@@ -1066,10 +1150,12 @@ void game_tick(){
                         }
                     break;
                     case SDLK_SPACE:
+                    case SDLK_r:
                         while(!chk_collision(0,-1)){
                             movep(px,py,px,py-1);
                             --py;
                         }
+
                         harddropped=1;
                     break;
                 }
@@ -1092,12 +1178,19 @@ void game_tick(){
         }
     }
 
-    if(!clearing){
+    if(!clearing && !gameover){
     goal = level*5+prevgoal;
 
     if(lines >=goal){
         ++level;
+                                s_beep(100,A5,2);
+                        s_beep(100,C6S,2);
+                        s_beep(100,E6,2);
+                        s_beep(100,A6,2);
+                        s_beep(100,A5,2);
+
         prevgoal=goal;
+
     }
 
     const Uint8* keyst = SDL_GetKeyboardState(NULL);
@@ -1105,7 +1198,10 @@ void game_tick(){
     if(keyst[SDL_SCANCODE_A]){
         if(frames%3==0){
             key_move_piece(px,py,px-1,py);
+
         }
+
+
     }
     if(keyst[SDL_SCANCODE_D]){
         if(frames%3==0){
@@ -1129,6 +1225,8 @@ void game_tick(){
 
     }
 
+    ;
+
 
     audio_tick();
 
@@ -1140,21 +1238,12 @@ void game_tick(){
 
 int main( int argc, char * argv[] )
 {
-
     srand(time(0));
 
     SDL msdl( SDL_INIT_VIDEO | SDL_INIT_TIMER );
 
-    TTF_Init();
 
     sdl = &msdl;
-
-    font = TTF_OpenFont("./font.ttf",30);
-        if(!font) {
-        printf("[ERROR] TTF_OpenFont() Failed with: %s\n", TTF_GetError());
-        exit(2);
-    }
-
 
 
     #ifdef EMCXX
@@ -1165,9 +1254,9 @@ int main( int argc, char * argv[] )
         game_tick();
     }
     #endif
-    TTF_CloseFont(font);
 
-    TTF_Quit();
+
+
 
     return 1;
 }
