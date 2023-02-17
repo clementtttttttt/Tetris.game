@@ -381,11 +381,12 @@ const char * InitError::what() const throw()
 class SDL
 {
     SDL_Window * m_window;
-    SDL_Renderer * m_renderer;
 public:
     SDL( Uint32 flags = 0 );
     virtual ~SDL();
     void draw();
+    SDL_Renderer * m_renderer;
+
 };
 
 SDL::SDL( Uint32 flags )
@@ -435,21 +436,29 @@ void s_beep(float len_ims, unsigned int freq,float len_ims2=0,unsigned int freq2
     s_eff_queue[0].push(DSN(SQR,freq, (unsigned int)(len_ims/1000*60), 50, 0.5));
 
 }
+int clearing=0;
+SDL *sdl;
+int played_p = 0, played_s = 0;
 
+int frames_old;
+int frames = 0;
 void f_update(){
     int fill_score_sum = 0;
     filledlines = 0;
     for(int y=0;y<23;++y){
         int isfilled = 1;
         for(int x=0;x<10;++x){
-            blocks[x][y].r |= blocks2[x][y].r;
-            blocks[x][y].g |= blocks2[x][y].g;
-            blocks[x][y].b |= blocks2[x][y].b;
-            blocks[x][y].a |= 255;
+            if(blocks2[x][y].a == 255){
+                blocks[x][y].r |= blocks2[x][y].r;
+                blocks[x][y].g |= blocks2[x][y].g;
+                blocks[x][y].b |= blocks2[x][y].b;
+                blocks[x][y].a |= 255;
+            }
+
             if((blocks[x][y].r==0)&&(blocks[x][y].g==0)&&(blocks[x][y].b==0)){
                 isfilled = 0;
             }
-            blocks2[x][y] = {0};
+            blocks2[x][y] = {0,0,0,0};
         }
         if(isfilled){
             ++filledlines;
@@ -499,12 +508,10 @@ void drawText ( SDL_Renderer* screen, char* str, int x, int y, int sz,SDL_Color 
 
     //printf("[ERROR] Unknown error in drawText(): %s\n", TTF_GetError()); return 1;
 }
-int frames_old;
-int frames = 0;
 
-int clearing=0;
 
-int played_p = 0, played_s = 0;;
+
+int px,py;
 
 SDL_Rect next_f_rects[] = {
     {40,26,2+4*26+2 + 20, 2},
@@ -513,6 +520,7 @@ SDL_Rect next_f_rects[] = {
     {40+4*26+2 + 20,26+2,2,4*26 + 20}
 };
 
+int prevgoal=0;
 
 void SDL::draw()
 {
@@ -552,18 +560,21 @@ void SDL::draw()
             collm = &coll_zed;
             break;
     }
+    int stoff=0;
 
 
     for(int x=0;x<4;++x){
+            if(next_piece == straight|| next_piece == square){
+                stoff =13;
+            }
             SDL_SetRenderDrawColor(m_renderer,piece_colours[next_piece-1].r,piece_colours[next_piece-1].g,piece_colours[next_piece-1].b,piece_colours[next_piece-1].a);
-            SDL_Rect bl_r = {40+2*26+((*collm)[0][x*2])*26,26+2*26-((*collm)[0][x*2+1])*26,26,26};
+            SDL_Rect bl_r = {stoff+40+2*26+((*collm)[0][x*2])*26,26+2*26-((*collm)[0][x*2+1])*26,26,26};
             SDL_RenderFillRect(m_renderer,&bl_r);
             SDL_SetRenderDrawColor(m_renderer,0,0,0,255);
             SDL_Rect ol_r = {bl_r.x + 4,bl_r.y + 4, bl_r.w - 8, bl_r.h - 8};
             SDL_RenderDrawRect(m_renderer,&ol_r);
             SDL_RenderDrawRect(m_renderer,&bl_r);
     }
-
     for(int x=0;x<10;++x){
         for(int y=0;y<23;++y){
             SDL_SetRenderDrawColor(m_renderer,blocks2[x][y].r,blocks2[x][y].g,blocks2[x][y].b,blocks2[x][y].a);
@@ -613,7 +624,14 @@ void SDL::draw()
 
     drawText(m_renderer, s, 552,160,26,{0xff,0xff,0xff,0xff},{0,0,0,0},1);
 
-        int fl3,fl1;
+    drawText(m_renderer, "GOAL",  604,200,26,{0xff,0xff,0xff,0xff},{0,0,0,0},1);
+
+    sprintf(s,"%03d",goal-prevgoal);
+
+    drawText(m_renderer, s, 578,220,26,{0xff,0xff,0xff,0xff},{0,0,0,0},1);
+
+
+            int fl3,fl1;
 
         int fl2=fl3=fl1=filledlines;
 
@@ -622,19 +640,19 @@ void SDL::draw()
             if(frames_old == 0)
                     frames_old = frames;
             clearing = 1;
-            SDL_SetRenderDrawColor(m_renderer,255,255,255,255);
+            SDL_SetRenderDrawColor(sdl->m_renderer,255,255,255,255);
 
             while(fl1){
                 --fl1;
                 SDL_Rect filled = {230,574-26-fly[fl1]*26,10*26,26};
-                SDL_RenderFillRect(m_renderer,&filled);
+                SDL_RenderFillRect(sdl->m_renderer,&filled);
 
             }
 
         }
     }
     if((frames-frames_old) > 16 && (frames-frames_old) <= 32){
-        SDL_SetRenderDrawColor(m_renderer,0,0,0,255);
+        SDL_SetRenderDrawColor(sdl->m_renderer,0,0,0,255);
         played_p=0;
         if(!played_s){
                         played_s = 1;
@@ -642,7 +660,7 @@ void SDL::draw()
         while(fl2){
             --fl2;
             SDL_Rect filled = {230,574-26-fly[fl2]*26,10*26,26};
-            SDL_RenderFillRect(m_renderer,&filled);
+            SDL_RenderFillRect(sdl->m_renderer,&filled);
 
         }
         if((frames-frames_old) == 32){
@@ -665,11 +683,8 @@ void SDL::draw()
             filledlines = 0;
             clearing = 0;
             played_s = 0;
-            for(int x=0;x<10;++x){
-                for(int y=0; y<23;++y){
-                    blocks2[x][y] = {0,0,0,0};
-                }
-            }
+            px=5;
+
         }
     }
 
@@ -684,7 +699,6 @@ void SDL::draw()
 
 
 
-SDL *sdl;
 
 int running = 1;
 
@@ -692,7 +706,6 @@ int running = 1;
 
 
 
-int px,py;
 
 int spawn = 1;
 
@@ -733,41 +746,20 @@ void movep(int oldx,int oldy, int x, int y,int isghost = 0){
     }
     for(int i=0;i<4;++i){
         #define lhs (blocks2[(*collm)[piece_or-1][i*2]+x][(*collm)[piece_or-1][i*2+1]+y])
-        lhs = piece_colours[curr_piece-1];
         if(isghost){
-            lhs.a = 0x88;
+            if(lhs.a != 0xff){
+                lhs.r = piece_colours[curr_piece-1].r;
+                lhs.g = piece_colours[curr_piece-1].g;
+                lhs.b = piece_colours[curr_piece-1].b;
+                lhs.a |= 0x88;
+            }
+        }else{
+            lhs = piece_colours[curr_piece-1];
         }
         #undef lhs
     }
     old_piece_or = piece_or;
 }
-
-
-
-void piece_spawn(){
-    curr_piece = next_piece;
-    next_piece = rand()%7 + 1;
-    piece_or = old_piece_or = 1;
-
-    if(curr_piece == straight) py = 22; else py = 22;
-
-    switch(curr_piece){
-        case straight:
-            px = 5;
-        break;
-        case square:
-            px = 5;
-        break;
-
-        default:
-            px = 4;
-
-    }
-            movep(px,py,px,py);
-
-}
-
-
 int chk_collision(int xoff=0,int yoff=0){
     int (*collm) [4][8];
 
@@ -819,6 +811,56 @@ int chk_collision(int xoff=0,int yoff=0){
     return 0;
 
 }
+int ogx,ogy,ogor=1;
+
+void ghost_tick(){
+    if((frames>10)&& !clearing){
+        int ghostoff = 0;
+
+        while(!chk_collision(0,ghostoff-1)){
+            --ghostoff;
+        }
+        int backup = old_piece_or;
+        old_piece_or=ogor;
+
+        movep(ogx,ogy,px,py+ghostoff,1);
+        old_piece_or = backup;
+        ogx=px;
+        ogy=py+ghostoff;
+        ogor=piece_or;
+        movep(px,py,px,py);
+    }
+}
+
+void piece_spawn(){
+    curr_piece = next_piece;
+    next_piece = rand()%7 + 1;
+    piece_or = old_piece_or = 1;
+
+    if(curr_piece == straight) py = 22; else py = 22;
+
+    switch(curr_piece){
+        case straight:
+            px = 5;
+        break;
+        case square:
+            px = 5;
+        break;
+
+        default:
+            px = 4;
+
+    }
+            for(int x=0;x<10;++x){
+                for(int y=0; y<23;++y){
+                    blocks2[x][y] = {0,0,0,0};
+                }
+            }
+            movep(px,py,px,py);
+    ghost_tick();
+}
+
+
 
 void rotate_piece(int left){
     old_piece_or = piece_or;
@@ -848,6 +890,7 @@ void rotate_piece(int left){
         s_beep(50,A4);
         s_beep(50,B4);
         s_beep(50,C5);
+    ghost_tick();
 }
 
 void key_move_piece(int oldx,int oldy, int newx, int newy){
@@ -863,37 +906,42 @@ void key_move_piece(int oldx,int oldy, int newx, int newy){
             movep(oldx,oldy,newx,newy);
 
 
-
+    ghost_tick();
 
 }
 
+int harddropped = 0;
 
 int s_cancelled = 0;
+int softd = 0;
 
 void drop_tick(){
-    if(spawn){
-        piece_spawn();
-        spawn=0;
-        return;
+
+    int checkz = (((powf(0.8-((level-1)*0.007),level-1)*60))/softd);
+    if(checkz == 0){
+        checkz = 10;
+    }
+    if(frames%checkz==0 || harddropped||frames == 1){
+        if(spawn){
+            piece_spawn();
+            spawn=0;
+            return;
+        }
+        harddropped=0;
+        if(chk_collision(0,-1)){
+            spawn = 1;
+                    movep(px,py,px,py);
+            f_update();
+            s_cancelled = 1;
+
+
+            return;
+        }
+        movep(px,py,px,py-1);
+        --py;
     }
 
-    if(chk_collision(0,-1)){
-        spawn = 1;
 
-        f_update();
-        s_cancelled = 1;
-
-
-        return;
-    }
-            for(int x=0;x<10;++x){
-                for(int y=0; y<23;++y){
-                    blocks2[x][y] = {0,0,0,0};
-                }
-            }
-
-            movep(px,py,px,py-1);
-            --py;
 
 
 
@@ -901,9 +949,7 @@ void drop_tick(){
 
 int w_up =1, q_up=1;
 
-int softd = 0;
 
-int harddropped = 0;
 
 void audio_tick(){
     int inc = 0;
@@ -988,10 +1034,10 @@ void audio_tick(){
 
 
 
-
 }
 
-int ogx,ogy,ogor=1;
+
+
 void game_tick(){
     ++frames;
     SDL_Event event;
@@ -1045,11 +1091,13 @@ void game_tick(){
             break;
         }
     }
+
     if(!clearing){
-    goal = level*5;
+    goal = level*5+prevgoal;
 
     if(lines >=goal){
         ++level;
+        prevgoal=goal;
     }
 
     const Uint8* keyst = SDL_GetKeyboardState(NULL);
@@ -1072,40 +1120,22 @@ void game_tick(){
 
 
 
-    int checkz = (((powf(0.8-((level-1)*0.007),level-1)*60))/softd);
-    if(checkz == 0){
-        checkz = 10;
-    }
-
-    if(frames%checkz==0 || harddropped||frames == 1){
-        if(harddropped){
-            drop_tick();
-                    harddropped = 0;
-            goto workaround;
-        }
         drop_tick();
-        workaround:;
+
+
+
+
+
 
     }
-    }
+
+
     audio_tick();
 
     sdl->draw();
 
-    if(frames>10){
-        int ghostoff = 0;
 
-        while(!chk_collision(0,ghostoff-1)){
-            --ghostoff;
-        }
-        int backup = old_piece_or;
-        old_piece_or=ogor;
-        movep(ogx,ogy,px,py+ghostoff,1);
-        old_piece_or = backup;
-        ogx=px;
-        ogy=py+ghostoff;
-        ogor=piece_or;
-    }
+
 }
 
 int main( int argc, char * argv[] )
