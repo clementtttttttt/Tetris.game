@@ -13,6 +13,8 @@ short* randtonegen(short mod, double volume, unsigned int *len,int smode){
     unsigned short xorr;
     unsigned char high = 0;
     randtone = ( short*)malloc(65536);
+    volume /=4;
+
     for(int i=0;i<32768;++i){
             if(i%mod == 0){
                 xorr = ((lfsr & 0b10) >> 1) ^ (lfsr&0b1);
@@ -35,6 +37,7 @@ short* randtonegen(short mod, double volume, unsigned int *len,int smode){
 
 short* sqrtonegen(unsigned int freq, unsigned int duty, double volume, unsigned int *len){
     short* buf = ( short* )malloc(sfreq/freq*2);
+    volume /=4;
     for(int i=0; i<sfreq/freq;++i){
         if(i<sfreq/freq*duty/100){
             buf[i]=32767 * volume;
@@ -49,8 +52,11 @@ short* sqrtonegen(unsigned int freq, unsigned int duty, double volume, unsigned 
 
 short* tritonegen(unsigned int freq, double volume, unsigned int *len){
     short* buf = ( short* )malloc(((sfreq/freq) + (sfreq/freq))*2);
+    volume /=4;
+
     double step = (32768/(sfreq/freq/2)) * volume;
     double counter = 0;
+
     for(int dir=0; dir<2; ++dir){
         for(int i=(sfreq/freq*dir)+5; i<sfreq/freq+(sfreq/freq*dir)+5;++i){
             if((i-(sfreq/freq*dir)) < (sfreq/freq/2)){
