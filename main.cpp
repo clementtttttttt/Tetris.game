@@ -475,6 +475,7 @@ void stopbgm() {
 	curr_rows[3] = 0;
 	Mix_HaltChannel(-1);
 }
+int pause=0;
 
 void SDL::draw() {
 	// Clear the window with a black background
@@ -623,7 +624,10 @@ void SDL::draw() {
 			px = 5;
 		}
 	}
+    if(pause){
+        drawText(m_renderer, " PAUSE ", 228 + 13 + 26, 104 +120, 26, {0xff, 0xff, 0xff, 0xff}, {0}, 0);
 
+    }
 	if (gameover) {
 		if (fillcounter) {
 			--fillcounter;
@@ -631,9 +635,9 @@ void SDL::draw() {
 				blocks[i][fillcounter] = {0x88, 0x88, 0x88, 0xff};
 			}
 		} else {
-			drawText(m_renderer, "GAME OVER", 256, 80, 22, {0xff, 0xff, 0xff, 0xff}, {0}, 0);
-			drawText(m_renderer, "PRESS H", 228 + 13 + 26, 104 + 80, 26, {0xff, 0xff, 0xff, 0xff}, {0}, 0);
-			drawText(m_renderer, "TO RETRY", 228 + 26, 130 + 80, 26, {0xff, 0xff, 0xff, 0xff}, {0}, 0);
+			drawText(m_renderer, "GAME OVER", 256, 140, 22, {0xff, 0xff, 0xff, 0xff}, {0}, 0);
+			drawText(m_renderer, "PRESS H", 228 + 13 + 26, 104 + 140, 26, {0xff, 0xff, 0xff, 0xff}, {0}, 0);
+			drawText(m_renderer, "TO RETRY", 228 + 26, 130 + 140, 26, {0xff, 0xff, 0xff, 0xff}, {0}, 0);
 		}
 	}
 
@@ -942,7 +946,7 @@ void audio_tick() {
 		}
 	}
 
-	if (!stop_music) {
+	if (!stop_music&&!pause) {
 		for (int i = 0; i < 4; ++i) {
 			if (theme[curr_rows[i]][i].valid) {
 
@@ -984,6 +988,7 @@ void audio_tick() {
 		}
 	}
 }
+
 
 void game_tick() {
 	++frames;
@@ -1039,13 +1044,28 @@ void game_tick() {
                     }
                     break;
                 case SDLK_m:
+                    if(!pause){
                     if(stop_music){
                             stop_music=0;
 
                     }
                     else stopbgm();
-
+                    }
                 break;
+                case SDLK_F1:
+                    if(!pause){
+                        pause=1;
+                        Mix_HaltChannel(-1);
+                        s_beep(90,C5,1,0.2);
+                        s_beep(90,C6,1,0.2);
+                        s_beep(90,C5,1,0.2);
+                        s_beep(90,C6,1,0.2);
+
+                    }
+                    else{
+                        pause=0;
+
+                    }
 				}
 			}
 
@@ -1067,7 +1087,7 @@ void game_tick() {
 		}
 	}
 
-	if (!clearing && !gameover) {
+	if (!clearing && !gameover && !pause) {
 		goal = level * 5 + prevgoal;
 
 		if (lines >= goal) {
