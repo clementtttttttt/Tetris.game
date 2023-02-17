@@ -343,7 +343,7 @@ SDL::SDL(Uint32 flags) {
 	if (SDL_Init(flags) != 0)
 		throw InitError();
 	SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
-	if (SDL_CreateWindowAndRenderer(720, 576, SDL_WINDOW_SHOWN, &m_window, &m_renderer) != 0)
+	if (SDL_CreateWindowAndRenderer(720, 576, SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE, &m_window, &m_renderer) != 0)
 		throw InitError();
 
 	Mix_OpenAudio(48000, AUDIO_S16LSB, 2, 256);
