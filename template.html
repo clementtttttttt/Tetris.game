@@ -10,7 +10,7 @@
       div.emscripten { text-align: center; }
       div.emscripten_border { border: 1px solid black; }
       /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
-      canvas.emscripten { border: 0px none; background-color: black; display: inline; width: 95vw; height: 76vw}
+      canvas.emscripten { border: 0px none; background-color: black; display: inline; max-width: 95vw; max-height: 60vh}
 	.dpad_buttons {
 		height: 10vh;
 		width: 10vw;
@@ -83,7 +83,7 @@
       <progress value="0" max="100" id="progress" hidden=1></progress>  
     </div>
     <div class="emscripten_border" id="canvas_div" style="text-align:center;">
-      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=1 align=center></canvas>
+      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" align=center></canvas>
     </div>
     <hr/>
     <div class="emscripten">
@@ -255,6 +255,22 @@
           Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
         }
       };
+	document.addEventListener("keydown",function(e){
+		var c=document.getElementById("canvas");
+		var ec=new KeyboardEvent('keydown',{'key': e.key, 'code': e.code, 'keyCode': e.keyCode});
+		console.log(e);
+		console.log(ec);
+		console.log(' ');		
+		c.dispatchEvent(ec);
+	});
+	document.addEventListener("keyup",function(e){
+		var c=document.getElementById("canvas");
+		var ec=new KeyboardEvent('keyup',{'key': e.key, 'code': e.code, 'keyCode': e.keyCode});
+		console.log(e);
+		console.log(ec);
+		console.log(' ');	
+		c.dispatchEvent(ec);
+	});
 	function onLHold(){
 		var c=document.getElementById("canvas");
 		c.focus();
