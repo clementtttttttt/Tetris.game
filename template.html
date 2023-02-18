@@ -12,14 +12,25 @@
       /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
       canvas.emscripten { border: 0px none; background-color: black; }
 	.dpad_buttons {
-		height: 18%;
-		width: 18%;
+		height: 10vh;
+		width: 10vw;
+		font-family: monospace;
+	  background-color: #4CAF50; /* Green */
+	}
+	.small_buttons {
+		height: 4vh;
+		width: 10vw;
 		font-family: monospace;
 	  background-color: #4CAF50; /* Green */
 	}
 	.pad_buttons {
-		padding: 18% 18%;
+		height: 10vh;
+		width: 10vw;
 
+	}
+	.control {
+		width: 32vw;
+		/*height: 50%;*/
 	}
       .spinner {
         height: 50px;
@@ -76,8 +87,7 @@
     </div>
     
     <hr/>
-
-    <table align="left">
+    <table class="control" align="left" >
 	<tr>
 	   <td>
 		<div class="pad_buttons"></div>
@@ -112,7 +122,7 @@
 	   </td> 
 	</tr>
     </table>
-    <table align="right">
+    <table class="control"  align="right" >
 	<tr>
 	   <td>
 		<div class="pad_buttons"></div>
@@ -147,16 +157,16 @@
 	   </td> 
 	</tr>
     </table>
-    <table align="center">
+    <table class="control"  align="center" >
 	<tr>
 	   <td>
-		<input class="dpad_buttons" id="dmute" type="button" value="MuteMusic" ontouchstart="onMute();" ontouchend="onLUp();" />
+		<input class="small_buttons" id="dmute" type="button" value="MuteMusic" ontouchstart="onMute();" ontouchend="onLUp();" />
 	   </td>
 	   <td>
 		<div class="pad_buttons"></div>
 	   </td>   
 	   <td>
-		<input class="dpad_buttons" id="dpause" type="button" value="Pause" ontouchstart="onPause();" />
+		<input class="small_buttons" id="dpause" type="button" value="Pause" ontouchstart="onPause();" />
 	   </td> 
 	</tr>
 	<tr>
