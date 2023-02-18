@@ -1041,7 +1041,7 @@ void game_tick() {
                         prevgoal = 0;
                         te_bag.clear();
                         fill_te_bag();
-                        fillcounter = 0;
+                        fillcounter = 23;
                         stop_music=0;
                     }
                     break;
