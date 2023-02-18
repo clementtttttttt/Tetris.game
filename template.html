@@ -105,6 +105,8 @@
     </div>
     
     <hr/>
+    <details id="conSpoil">
+    <summary style="font-family: sans-serif;">Reveal mobile gamepad</summary>
     <table class="control" align="left" >
 	<tr>
 	   <td>
@@ -175,6 +177,7 @@
 	   </td> 
 	</tr>
     </table>
+    </details>
     <br>
 
     <script type='text/javascript'>
@@ -243,19 +246,26 @@
       };
 	document.addEventListener("keydown",function(e){
 		var c=document.getElementById("canvas");
-		var ec=new KeyboardEvent('keydown',{'key': e.key, 'code': e.code, 'keyCode': e.keyCode});
-		console.log(e);
-		console.log(ec);
-		console.log(' ');		
+		var ec=new KeyboardEvent('keydown',{'key': e.key, 'code': e.code, 'keyCode': e.keyCode});		
 		c.dispatchEvent(ec);
 	});
 	document.addEventListener("keyup",function(e){
 		var c=document.getElementById("canvas");
 		var ec=new KeyboardEvent('keyup',{'key': e.key, 'code': e.code, 'keyCode': e.keyCode});
-		console.log(e);
-		console.log(ec);
-		console.log(' ');	
 		c.dispatchEvent(ec);
+	});
+	var oldCHeight;
+	document.getElementById("conSpoil").addEventListener("toggle",function(){
+		var cs=document.getElementById("conSpoil");
+		var c=document.getElementById("canvas");
+				
+		if(cs.open){
+			oldCHeight = c.style.maxHeight;
+			console.log(c.style.maxHeight);
+			c.style.maxHeight = "90vh"; 
+		} else {
+			 c.style.maxHeight = oldCHeight;
+		}
 	});
 	function onLHold(){
 		var c=document.getElementById("canvas");
