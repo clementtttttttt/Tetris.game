@@ -883,7 +883,7 @@ void drop_tick() {
 	if (checkz == 0) {
 		checkz = 10;
 	}
-	if (frames % checkz == 0 || harddropped) {
+	if (frames % checkz == 0 || harddropped || frames == 1) {
 		if (spawn) {
 			piece_spawn();
 			spawn = 0;
@@ -1002,7 +1002,7 @@ void game_tick() {
 			running = 0;
 			break;
 		case SDL_KEYDOWN:
-			if (frames > 10) {
+			if (frames > 30) {
 				switch (event.key.keysym.sym) {
 				case SDLK_w:
 					if (w_up) {
@@ -1041,6 +1041,7 @@ void game_tick() {
                         prevgoal = 0;
                         te_bag.clear();
                         fill_te_bag();
+                        fillcounter = 0;
                         stop_music=0;
                     }
                     break;
@@ -1125,7 +1126,6 @@ void game_tick() {
 	;
 
 	audio_tick();
-
 	sdl->draw();
 }
 
