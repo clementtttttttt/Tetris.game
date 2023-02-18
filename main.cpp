@@ -474,6 +474,12 @@ void stopbgm() {
 	curr_rows[1] = 0;
 	curr_rows[2] = 0;
 	curr_rows[3] = 0;
+	for(int x=0;x<4;x++){
+        for(int y=0;theme[y][x].valid;++y){
+            theme[y][x].playin=0;
+            theme[y][x].durrcount=0;
+        }
+	}
 	Mix_HaltChannel(-1);
 }
 int pause=0;
