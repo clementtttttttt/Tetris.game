@@ -5,12 +5,12 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Emscripten-Generated Code</title>
     <style>
-      .emscripten { padding-right: 0; margin-left: auto; margin-right: auto; display: block; }
+      .emscripten { padding-right: 0; display: block;}
       textarea.emscripten { font-family: monospace; width: 80%; }
       div.emscripten { text-align: center; }
       div.emscripten_border { border: 1px solid black; }
       /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
-      canvas.emscripten { border: 0px none; background-color: black; }
+      canvas.emscripten { border: 0px none; background-color: black; display: inline; }
 	.dpad_buttons {
 		height: 10vh;
 		width: 10vw;
@@ -32,6 +32,7 @@
 		width: 32vw;
 		/*height: 50%;*/
 	}
+
       .spinner {
         height: 50px;
         width: 50px;
@@ -74,8 +75,8 @@
     <div class="emscripten">
       <progress value="0" max="100" id="progress" hidden=1></progress>  
     </div>
-    <div class="emscripten_border" id="canvas_div">
-      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=0></canvas>
+    <div class="emscripten_border" id="canvas_div" style="text-align:center;">
+      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=1 align=center></canvas>
     </div>
     <hr/>
     <div class="emscripten">
