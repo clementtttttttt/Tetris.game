@@ -13,23 +13,31 @@
       canvas.emscripten { border: 0px none; background-color: black; display: inline; max-width: 95vw; max-height: 60vh}
 	.dpad_buttons {
 		height: 10vh;
-		width: 10vw;
+		width: 16vw;
 		font-family: monospace;
 	  background-color: #4CAF50; /* Green */
 	}
 	.small_buttons {
 		height: 4vh;
-		width: 10vw;
+		margin: auto;
+		width: 50%;
+  		text-align: center;
 		font-family: monospace;
 	  background-color: #4CAF50; /* Green */
 	}
-	.pad_buttons {
-		height: 10vh;
+	.small_pad_buttons {
+		height: 4vh;
 		width: 10vw;
 
 	}
+	.pad_buttons {
+		height: 10vh;
+		width: 16vw;
+
+	}
 	.control {
-		width: 32vw;
+		width: 50vw;
+		text-align: center;
 		/*height: 50%;*/
 	}
 	body {
@@ -37,9 +45,8 @@
   		height: 100vh;
 		overflow: hidden;
 	}
-	html, body {
 
-	}
+
       .spinner {
         height: 50px;
         width: 50px;
@@ -104,7 +111,7 @@
 		<input class="dpad_buttons" id="dhard" type="button" value="HardD" ontouchstart="onHD();" />
 	   </td>   
 	   <td>
-		<div class="pad_buttons"></div>
+		<input class="small_buttons" align="center" id="dmute" type="button" value="MuteMusic" ontouchstart="onMute();" ontouchend="onLUp();" />
 	   </td> 
 	</tr>
 	<tr>
@@ -133,7 +140,7 @@
     <table class="control"  align="right" >
 	<tr>
 	   <td>
-		<div class="pad_buttons"></div>
+		<input class="small_buttons" id="dpause" type="button" value="Pause" ontouchstart="onPause();" />
 	   </td>
 	   <td>
 		<input class="dpad_buttons" id="dretry" type="button" value="Retry" ontouchstart="onRetry();" />
@@ -165,32 +172,8 @@
 	   </td> 
 	</tr>
     </table>
-    <table class="control"  align="center" >
-	<tr>
-	   <td>
-		<input class="small_buttons" id="dmute" type="button" value="MuteMusic" ontouchstart="onMute();" ontouchend="onLUp();" />
-	   </td>
-	   <td>
-		<input class="small_buttons" id="dpause" type="button" value="Pause" ontouchstart="onPause();" />
-	   </td> 
-	</tr>
-	<tr>
-	   <td>
-		<div class="pad_buttons"></div>
-	   </td>
-	   <td>
-		<div class="pad_buttons"></div>
-	   </td> 
-	</tr>
-	<tr>
-	   <td>
-		<div class="pad_buttons"></div>
-	   </td>
-	   <td>
-		<div class="pad_buttons"></div>
-	   </td> 
-	</tr>
-    </table>
+    <br>
+
     <script type='text/javascript'>
       var statusElement = document.getElementById('status');
       var progressElement = document.getElementById('progress');
@@ -360,7 +343,9 @@
         Module.setStatus('Exception thrown, see JavaScript console');
         spinnerElement.style.display = 'none';
         Module.setStatus = function(text) {
-          if (text) console.error('[post-exception status] ' + text);
+          if (text) {
+		alert("Exception details: " + text);
+	  }
         };
       };
     </script>
