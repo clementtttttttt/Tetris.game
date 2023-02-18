@@ -71,7 +71,7 @@
       <input type="checkbox" id="resize">Resize canvas
       <input type="checkbox" id="pointerLock" checked>Lock/hide mouse pointer
       &nbsp;&nbsp;&nbsp;
-      <input type="button" value="Fullscreen" onclick="Module.requestFullscreen(document.getElementById('pointerLock').checked, 
+      <input type="button" value="Fullscreen" ontouchstart="Module.requestFullscreen(document.getElementById('pointerLock').checked, 
                                                                                 document.getElementById('resize').checked)">
     </div>
     
@@ -83,7 +83,7 @@
 		<div class="pad_buttons"></div>
 	   </td>
 	   <td>
-		<input class="dpad_buttons" id="dhard" type="button" value="HardD" onclick="onHD();" />
+		<input class="dpad_buttons" id="dhard" type="button" value="HardD" ontouchstart="onHD();" />
 	   </td>   
 	   <td>
 		<div class="pad_buttons"></div>
@@ -91,13 +91,13 @@
 	</tr>
 	<tr>
 	   <td>
-		<input class="dpad_buttons" id="dleft" type="button" value="Left" onmousedown="onLHold();" onmouseup="onLUp();" />
+		<input class="dpad_buttons" id="dleft" type="button" value="Left" ontouchstart="onLHold();" ontouchend="onLUp();" />
 	   </td>
 	   <td>
 		<div class="pad_buttons"></div>
 	   </td>   
 	   <td>
-		<input class="dpad_buttons" id="dright" type="button" value="Right" onmousedown="onRHold();" onmouseup="onRUp();" />
+		<input class="dpad_buttons" id="dright" type="button" value="Right" ontouchstart="onRHold();" ontouchend="onRUp();" />
 	   </td> 
 	</tr>
 	<tr>
@@ -105,7 +105,7 @@
 		<div class="pad_buttons"></div>
 	   </td>
 	   <td>
-		<input class="dpad_buttons" id="dsoft" type="button" value="SoftD" onmousedown="onSHold();" onmouseup="onSUp();" />
+		<input class="dpad_buttons" id="dsoft" type="button" value="SoftD" ontouchstart="onSHold();" ontouchend="onSUp();" />
 	   </td>   
 	   <td>
 		<div class="pad_buttons"></div>
@@ -118,7 +118,7 @@
 		<div class="pad_buttons"></div>
 	   </td>
 	   <td>
-		<input class="dpad_buttons" id="dretry" type="button" value="Retry" onclick="onRetry();" />
+		<input class="dpad_buttons" id="dretry" type="button" value="Retry" ontouchstart="onRetry();" />
 	   </td>   
 	   <td>
 		<div class="pad_buttons"></div>
@@ -132,7 +132,7 @@
 		<div class="pad_buttons"></div>
 	   </td>   
 	   <td>
-		<input class="dpad_buttons" id="dcw" type="button" value="RClockW" onclick="onRC();" />
+		<input class="dpad_buttons" id="dcw" type="button" value="RClockW" ontouchstart="onRC();" />
 	   </td> 
 	</tr>
 	<tr>
@@ -140,7 +140,7 @@
 		<div class="pad_buttons"></div>
 	   </td>
 	   <td>
-		<input class="dpad_buttons" id="dacw" type="button" value="RAClockW" onclick="onLC();" />
+		<input class="dpad_buttons" id="dacw" type="button" value="RAClockW" ontouchstart="onLC();" />
 	   </td>   
 	   <td>
 		<div class="pad_buttons"></div>
@@ -150,13 +150,13 @@
     <table align="center">
 	<tr>
 	   <td>
-		<input class="dpad_buttons" id="dmute" type="button" value="MuteMusic" onmousedown="onMute();" onmouseup="onLUp();" />
+		<input class="dpad_buttons" id="dmute" type="button" value="MuteMusic" ontouchstart="onMute();" ontouchend="onLUp();" />
 	   </td>
 	   <td>
 		<div class="pad_buttons"></div>
 	   </td>   
 	   <td>
-		<input class="dpad_buttons" id="dpause" type="button" value="Pause" onclick="onPause();" />
+		<input class="dpad_buttons" id="dpause" type="button" value="Pause" ontouchstart="onPause();" />
 	   </td> 
 	</tr>
 	<tr>
