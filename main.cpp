@@ -679,6 +679,9 @@ void movep(int oldx, int oldy, int x, int y, int isghost = 0) {
 	}
 
 	for (int i = 0; i < 4; ++i) {
+        if(((*collm)[old_piece_or - 1][i * 2] + oldx) >=9){
+            return;
+        }
 #define lhs (blocks2[(*collm)[old_piece_or - 1][i * 2] + oldx][(*collm)[old_piece_or - 1][i * 2 + 1] + oldy])
 		lhs = {0, 0, 0, 0};
 #undef lhs
