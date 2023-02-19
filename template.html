@@ -10,7 +10,7 @@
       div.emscripten { text-align: center; }
       div.emscripten_border { border: 1px solid black; }
       /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
-      canvas.emscripten { border: 0px none; background-color: black; display: inline; max-width: 95vw; max-height: 60vh}
+      canvas.emscripten { border: 0px none; background-color: black; display: inline; height: 100%; width: 100%; }
 	.dpad_buttons {
 		height: 10vh;
 		width: 16vw;
@@ -48,7 +48,9 @@
   		height: 100vh;
 		overflow: hidden;
 	}
-
+	.canvas_div {
+		max-width: 95vw; height: 60vh; margin: 0 auto; aspect-ratio: 720/576; 
+	}
 
       .spinner {
         height: 50px;
@@ -92,7 +94,7 @@
     <div class="emscripten">
       <progress value="0" max="100" id="progress" hidden=1></progress>  
     </div>
-    <div class="emscripten_border" id="canvas_div" style="text-align:center;">
+    <div class="emscripten_border canvas_div" id="canvas_div" style="text-align:center;">
       <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" align=center></canvas>
     </div>
     <hr/>
@@ -178,8 +180,6 @@
 	</tr>
     </table>
     </details>
-    <br>
-
     <script type='text/javascript'>
       var statusElement = document.getElementById('status');
       var progressElement = document.getElementById('progress');
