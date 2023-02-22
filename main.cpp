@@ -805,9 +805,9 @@ void piece_spawn() {
 	piece_or = old_piece_or = 1;
 
 	if (curr_piece == straight)
-		py = 22;
+		py = 23;
 	else
-		py = 22;
+		py = 23;
 
 	switch (curr_piece) {
 	case straight:
@@ -833,7 +833,9 @@ void piece_spawn() {
 		return;
 	}
 
-	movep(px, py, px, py);
+	//movep(px, py, px, py);
+
+
 	ghost_tick();
 }
 

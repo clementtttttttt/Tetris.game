@@ -352,12 +352,12 @@
 		c.dispatchEvent(new KeyboardEvent('keyup', {'key': 'h', 'code': 'KeyM', 'keyCode': 72}));
 	}
       Module.setStatus('Downloading...');
-      window.onerror = function() {
+      window.onerror = function(err) {
         Module.setStatus('Exception thrown, see JavaScript console');
         spinnerElement.style.display = 'none';
         Module.setStatus = function(text) {
           if (text) {
-		alert("Exception details: " + text);
+		alert("Exception details: " + err);
 	  }
         };
       };
