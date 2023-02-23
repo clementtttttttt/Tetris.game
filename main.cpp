@@ -828,7 +828,7 @@ void piece_spawn() {
 		}
 	}
 
-	if (chk_collision()) {
+	if (chk_collision(0,-1)) {
 		gameover = 1;
 		stopbgm();
 
