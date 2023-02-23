@@ -557,6 +557,8 @@ void SDL::draw() {
 	}
 	drawText(m_renderer, "SCORE", 630, 20, 26, {0xff, 0xff, 0xff, 0xff}, {0, 0, 0, 0}, 1);
 	drawText(m_renderer, "NEXT", 50, 20, 26, {0xff, 0xff, 0xff, 0xff}, {0, 0, 0, 0}, 0);
+    drawText(m_renderer, "MADE BY", 26*20, 576-26*3, 26, {0xff, 0xff, 0xff, 0xff},{0}, 0);
+    drawText(m_renderer, "CLEME8T", 26*20, 576-26*2, 26, {0xff, 0xff, 0xff, 0xff},{0}, 0);
 
 	char s[12];
 
