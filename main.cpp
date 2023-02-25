@@ -434,7 +434,6 @@ int stop_music = 0;
 
 void drawText(SDL_Renderer *screen, char *str, int x, int y, int sz, SDL_Color fgC, SDL_Color bgC, int leftanchor) {
 
-	TTF_Init();
 
 	font = TTF_OpenFont("./font.ttf", 30);
 	if (!font) {
@@ -454,7 +453,6 @@ void drawText(SDL_Renderer *screen, char *str, int x, int y, int sz, SDL_Color f
 	SDL_FreeSurface(textSurface);
 	TTF_CloseFont(font);
 
-	TTF_Quit();
 	// printf("[ERROR] Unknown error in drawText(): %s\n", TTF_GetError());
 	// return 1;
 }
@@ -773,7 +771,6 @@ void ghost_tick() {
 		ogx = px;
 		ogy = py + ghostoff;
 		ogor = piece_or;
-		movep(px, py, px, py);
 	}
 }
 
@@ -1148,6 +1145,7 @@ int main(int argc, char *argv[]) {
 	SDL msdl(SDL_INIT_VIDEO | SDL_INIT_TIMER);
 
 	sdl = &msdl;
+	TTF_Init();
 
 #ifdef EMCXX
 	emscripten_set_main_loop(game_tick, 60, 1);
@@ -1157,6 +1155,7 @@ int main(int argc, char *argv[]) {
 		game_tick();
 	}
 #endif
+	TTF_Quit();
 
 	return 1;
 }
