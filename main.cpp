@@ -600,7 +600,7 @@ void SDL::draw() {
 			}
 		}
 	}
-	if ((frames - frames_old) > 16 && (frames - frames_old) <= 32) {
+	if ((frames - frames_old) > 14 && (frames - frames_old) <= 28) {
 		SDL_SetRenderDrawColor(sdl->m_renderer, 0, 0, 0, 255);
 		played_p = 0;
 		if (!played_s) {
@@ -611,7 +611,7 @@ void SDL::draw() {
 			SDL_Rect filled = {230, 574 - 26 - fly[fl2] * 26, 10 * 26, 26};
 			SDL_RenderFillRect(sdl->m_renderer, &filled);
 		}
-		if ((frames - frames_old) == 32) {
+		if ((frames - frames_old) == 28) {
 			while (fl3) {
 				--fl3;
 				for (int y = fly[fl3] + 1; y < 24; ++y) {
@@ -887,13 +887,16 @@ int harddropped = 0;
 int s_cancelled = 0;
 int softd = 0;
 
+int starta=0, startd=0, starts=0,sd=0;
+
+
 void drop_tick() {
 
 	int checkz = (((powf(0.8 - ((level - 1) * 0.007), level - 1) * 60)) / softd);
 	if (checkz == 0) {
 		checkz = 10;
 	}
-	if (frames % checkz == 0 || harddropped || frames == 1) {
+	if ((frames-sd*starts) % checkz == 0 || harddropped || frames == 1) {
 		if (spawn) {
 			piece_spawn();
 			spawn = 0;
@@ -1000,7 +1003,6 @@ void audio_tick() {
 	}
 }
 
-
 void game_tick() {
 	++frames;
 	SDL_Event event;
@@ -1027,6 +1029,15 @@ void game_tick() {
 
 						q_up = 0;
 					}
+					break;
+				case SDLK_a:
+					starta=frames;
+					break;
+                case SDLK_d:
+					startd=frames;
+					break;
+                case SDLK_s:
+					starts=frames;
 					break;
 				case SDLK_SPACE:
 				case SDLK_r:
@@ -1116,17 +1127,19 @@ void game_tick() {
 		const Uint8 *keyst = SDL_GetKeyboardState(NULL);
 
 		if (keyst[SDL_SCANCODE_A]) {
-			if (frames % 3 == 0) {
+			if ((frames-starta) % 4 == 0) {
 				key_move_piece(px, py, px - 1, py);
 			}
 		}
 		if (keyst[SDL_SCANCODE_D]) {
-			if (frames % 3 == 0) {
+			if ((frames-startd) % 4 == 0) {
 				key_move_piece(px, py, px + 1, py);
 			}
 		}
+		sd=0;
 		if (keyst[SDL_SCANCODE_S] && !s_cancelled&& frames>30) {
 			softd = 20;
+			sd=1;
 		} else
 			softd = 1;
 
