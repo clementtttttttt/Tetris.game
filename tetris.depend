@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1677062656 source:/home/clement/Desktop/tetris/main.cpp
+1679342617 source:/home/clement/Desktop/tetris/main.cpp
 	"notes.hpp"
 	<SDL.h>
 	<SDL_mixer.h>
@@ -10,7 +10,7 @@
 	<string>
 	<emscripten.h>
 
-1675830167 /usr/include/SDL2/SDL.h
+1678244445 /usr/include/SDL2/SDL.h
 	"SDL_main.h"
 	"SDL_stdinc.h"
 	"SDL_assert.h"
@@ -48,7 +48,7 @@
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_main.h
+1678244445 /usr/include/SDL2/SDL_main.h
 	"SDL_stdinc.h"
 	"begin_code.h"
 	"close_code.h"
@@ -96,7 +96,7 @@
 
 1678244445 /usr/include/SDL2/close_code.h
 
-1675830167 /usr/include/SDL2/SDL_assert.h
+1678244445 /usr/include/SDL2/SDL_assert.h
 	"SDL_stdinc.h"
 	"begin_code.h"
 	<signal.h>
@@ -157,12 +157,12 @@
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_clipboard.h
+1678244445 /usr/include/SDL2/SDL_clipboard.h
 	"SDL_stdinc.h"
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_cpuinfo.h
+1678244445 /usr/include/SDL2/SDL_cpuinfo.h
 	"SDL_stdinc.h"
 	<intrin.h>
 	<intrin.h>
@@ -184,7 +184,7 @@
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_events.h
+1678244445 /usr/include/SDL2/SDL_events.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"SDL_video.h"
@@ -198,7 +198,7 @@
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_video.h
+1678244445 /usr/include/SDL2/SDL_video.h
 	"SDL_stdinc.h"
 	"SDL_pixels.h"
 	"SDL_rect.h"
@@ -206,13 +206,13 @@
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_pixels.h
+1678244445 /usr/include/SDL2/SDL_pixels.h
 	"SDL_stdinc.h"
 	"SDL_endian.h"
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_rect.h
+1678244445 /usr/include/SDL2/SDL_rect.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"SDL_pixels.h"
@@ -220,7 +220,7 @@
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_surface.h
+1678244445 /usr/include/SDL2/SDL_surface.h
 	"SDL_stdinc.h"
 	"SDL_pixels.h"
 	"SDL_rect.h"
@@ -229,11 +229,11 @@
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_blendmode.h
+1678244445 /usr/include/SDL2/SDL_blendmode.h
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_keyboard.h
+1678244445 /usr/include/SDL2/SDL_keyboard.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"SDL_keycode.h"
@@ -241,34 +241,34 @@
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_keycode.h
+1678244445 /usr/include/SDL2/SDL_keycode.h
 	"SDL_stdinc.h"
 	"SDL_scancode.h"
 
-1675830167 /usr/include/SDL2/SDL_scancode.h
+1678244445 /usr/include/SDL2/SDL_scancode.h
 	"SDL_stdinc.h"
 
-1675830167 /usr/include/SDL2/SDL_mouse.h
+1678244445 /usr/include/SDL2/SDL_mouse.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"SDL_video.h"
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_joystick.h
+1678244445 /usr/include/SDL2/SDL_joystick.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"SDL_guid.h"
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_guid.h
+1678244445 /usr/include/SDL2/SDL_guid.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_gamecontroller.h
+1678244445 /usr/include/SDL2/SDL_gamecontroller.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"SDL_rwops.h"
@@ -277,17 +277,17 @@
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_sensor.h
+1678244445 /usr/include/SDL2/SDL_sensor.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_quit.h
+1678244445 /usr/include/SDL2/SDL_quit.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 
-1675830167 /usr/include/SDL2/SDL_gesture.h
+1678244445 /usr/include/SDL2/SDL_gesture.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"SDL_video.h"
@@ -295,70 +295,70 @@
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_touch.h
+1678244445 /usr/include/SDL2/SDL_touch.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"SDL_video.h"
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_filesystem.h
+1678244445 /usr/include/SDL2/SDL_filesystem.h
 	"SDL_stdinc.h"
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_haptic.h
+1678244445 /usr/include/SDL2/SDL_haptic.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"SDL_joystick.h"
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_hidapi.h
+1678244445 /usr/include/SDL2/SDL_hidapi.h
 	"SDL_stdinc.h"
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_hints.h
+1678244445 /usr/include/SDL2/SDL_hints.h
 	"SDL_stdinc.h"
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_loadso.h
+1678244445 /usr/include/SDL2/SDL_loadso.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_log.h
+1678244445 /usr/include/SDL2/SDL_log.h
 	"SDL_stdinc.h"
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_messagebox.h
+1678244445 /usr/include/SDL2/SDL_messagebox.h
 	"SDL_stdinc.h"
 	"SDL_video.h"
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_metal.h
+1678244445 /usr/include/SDL2/SDL_metal.h
 	"SDL_video.h"
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_power.h
+1678244445 /usr/include/SDL2/SDL_power.h
 	"SDL_stdinc.h"
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_render.h
+1678244445 /usr/include/SDL2/SDL_render.h
 	"SDL_stdinc.h"
 	"SDL_rect.h"
 	"SDL_video.h"
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_shape.h
+1678244445 /usr/include/SDL2/SDL_shape.h
 	"SDL_stdinc.h"
 	"SDL_pixels.h"
 	"SDL_rect.h"
@@ -367,7 +367,7 @@
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_system.h
+1678244445 /usr/include/SDL2/SDL_system.h
 	"SDL_stdinc.h"
 	"SDL_keyboard.h"
 	"SDL_render.h"
@@ -375,7 +375,7 @@
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_timer.h
+1678244445 /usr/include/SDL2/SDL_timer.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"begin_code.h"
@@ -386,13 +386,13 @@
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_locale.h
+1678244445 /usr/include/SDL2/SDL_locale.h
 	"SDL_stdinc.h"
 	"SDL_error.h"
 	"begin_code.h"
 	"close_code.h"
 
-1675830167 /usr/include/SDL2/SDL_misc.h
+1678244445 /usr/include/SDL2/SDL_misc.h
 	"SDL_stdinc.h"
 	"begin_code.h"
 	"close_code.h"
