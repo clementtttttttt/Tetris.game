@@ -435,12 +435,6 @@ int stop_music = 0;
 void drawText(SDL_Renderer *screen, char *str, int x, int y, int sz, SDL_Color fgC, SDL_Color bgC, int leftanchor) {
 
 
-	font = TTF_OpenFont("./font.ttf", 30);
-	if (!font) {
-		printf("[ERROR] TTF_OpenFont() Failed with: %s\n", TTF_GetError());
-		exit(2);
-	}
-
 	// SDL_Surface* textSurface = TTF_RenderText_Solid(font, string, fgC);
 	// // aliased glyphs
 	SDL_Surface *textSurface = TTF_RenderText_Solid(font, str, fgC); // anti-aliased glyphs
@@ -451,7 +445,6 @@ void drawText(SDL_Renderer *screen, char *str, int x, int y, int sz, SDL_Color f
 
 	SDL_DestroyTexture(t);
 	SDL_FreeSurface(textSurface);
-	TTF_CloseFont(font);
 
 	// printf("[ERROR] Unknown error in drawText(): %s\n", TTF_GetError());
 	// return 1;
@@ -532,21 +525,9 @@ void SDL::draw() {
 	}
 	for (int x = 0; x < 10; ++x) {
 		for (int y = 0; y < 23; ++y) {
-			SDL_SetRenderDrawColor(m_renderer, blocks2[x][y].r, blocks2[x][y].g, blocks2[x][y].b, blocks2[x][y].a);
+			SDL_SetRenderDrawColor(m_renderer, blocks[x][y].r | blocks2[x][y].r, blocks[x][y].g | blocks2[x][y].g, blocks[x][y].b | blocks2[x][y].b, blocks[x][y].a | blocks2[x][y].a);
 			SDL_Rect bl_r = {230 + x * 26, 574 - 26 - y * 26, 26, 26};
 			SDL_RenderFillRect(m_renderer, &bl_r);
-			SDL_SetRenderDrawColor(m_renderer, 0, 0, 0, 255);
-			SDL_Rect ol_r = {bl_r.x + 4, bl_r.y + 4, bl_r.w - 8, bl_r.h - 8};
-			SDL_RenderDrawRect(m_renderer, &ol_r);
-			SDL_RenderDrawRect(m_renderer, &bl_r);
-		}
-	}
-	for (int x = 0; x < 10; ++x) {
-		for (int y = 0; y < 23; ++y) {
-			SDL_SetRenderDrawColor(m_renderer, blocks[x][y].r, blocks[x][y].g, blocks[x][y].b, blocks[x][y].a);
-			SDL_Rect bl_r = {230 + x * 26, 574 - 26 - y * 26, 26, 26};
-			if (blocks[x][y].r != 0 || blocks[x][y].g != 0 || blocks[x][y].b != 0)
-				SDL_RenderFillRect(m_renderer, &bl_r);
 			SDL_SetRenderDrawColor(m_renderer, 0, 0, 0, 255);
 			SDL_Rect ol_r = {bl_r.x + 4, bl_r.y + 4, bl_r.w - 8, bl_r.h - 8};
 			SDL_RenderDrawRect(m_renderer, &ol_r);
@@ -1150,15 +1131,24 @@ void game_tick() {
 
 	audio_tick();
 	sdl->draw();
+
 }
 
 int main(int argc, char *argv[]) {
+
+
 	srand(time(0));
 	fill_te_bag();
 	SDL msdl(SDL_INIT_VIDEO | SDL_INIT_TIMER);
 
 	sdl = &msdl;
 	TTF_Init();
+
+	font = TTF_OpenFont("./font.ttf", 30);
+	if (!font) {
+		printf("[ERROR] TTF_OpenFont() Failed with: %s\n", TTF_GetError());
+		exit(2);
+	}
 
 #ifdef EMCXX
 	emscripten_set_main_loop(game_tick, 60, 1);
@@ -1168,6 +1158,9 @@ int main(int argc, char *argv[]) {
 		game_tick();
 	}
 #endif
+
+	TTF_CloseFont(font);
+
 	TTF_Quit();
 
 	return 1;
