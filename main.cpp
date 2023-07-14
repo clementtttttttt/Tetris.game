@@ -932,7 +932,11 @@ void audio_tick() {
 				s_eff_queue[i].front().c = Mix_QuickLoad_RAW((Uint8 *)s_eff_queue[i].front().buf, len);
 				Mix_PlayChannel(-1, s_eff_queue[i].front().c, -1);
 			}
-			--s_eff_queue[i].front().durrcount;
+
+
+			s_eff_queue[i].front().durrcount -= 2;
+
+
 			if (s_eff_queue[i].front().durrcount <= 0) {
 				Mix_FreeChunk(s_eff_queue[i].front().c);
 				free(s_eff_queue[i].front().buf);
@@ -965,7 +969,10 @@ void audio_tick() {
 					theme[curr_rows[i]][i].c = Mix_QuickLoad_RAW((Uint8 *)theme[curr_rows[i]][i].buf, len);
 					Mix_PlayChannel(-1, theme[curr_rows[i]][i].c, -1);
 				}
-				--theme[curr_rows[i]][i].durrcount;
+
+
+				theme[curr_rows[i]][i].durrcount -= 2;
+
 
 				if (theme[curr_rows[i]][i].durrcount <= 0) {
 					theme[curr_rows[i]][i].playin = 0;
@@ -1127,9 +1134,11 @@ void game_tick() {
 		drop_tick();
 	}
 
-	;
 
-	audio_tick();
+	if(frames%2){
+        audio_tick();
+    }
+
 	sdl->draw();
 
 }
