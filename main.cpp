@@ -1115,18 +1115,18 @@ void game_tick() {
 		const Uint8 *keyst = SDL_GetKeyboardState(NULL);
 
 		if (keyst[SDL_SCANCODE_A]) {
-			if (((frames-starta) % 3 == 0)&&((frames-starta)>=18)||((frames-starta)==0)) {
+			if (((frames-starta) % 3 == 0)&&((frames-starta)>=12)||((frames-starta)==0)) {
 				key_move_piece(px, py, px - 1, py);
 			}
 		}
 		if (keyst[SDL_SCANCODE_D]) {
-			if (((frames-startd) % 3 == 0)&&((frames-startd)>=18)||((frames-startd)==0)) {
+			if (((frames-startd) % 3 == 0)&&((frames-startd)>=12)||((frames-startd)==0)) {
 				key_move_piece(px, py, px + 1, py);
 			}
 		}
 		sd=0;
 		if (keyst[SDL_SCANCODE_S] && !s_cancelled&& frames>30) {
-			softd = 20;
+			softd = 12;
 			sd=1;
 		} else
 			softd = 1;
