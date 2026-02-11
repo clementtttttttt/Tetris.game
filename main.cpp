@@ -6,6 +6,8 @@
 #include <iostream>
 #include <queue>
 #include <string>
+#include<thread>
+#include <chrono>
 #ifdef EMCXX
 #include <emscripten.h>
 #endif // EMCXX
@@ -870,10 +872,10 @@ int softd = 0;
 
 int starta=0, startd=0, starts=0,sd=0;
 
-
+int framerate = 60;
 void drop_tick() {
 
-	int checkz = (((powf(0.8 - ((level - 1) * 0.007), level - 1) * 60)) / softd);
+	int checkz = (((powf(0.8 - ((level - 1) * 0.007), level - 1) * framerate)) / softd);
 	if (checkz == 0) {
 		checkz = 10;
 	}
@@ -979,7 +981,7 @@ void audio_tick() {
 					Mix_FreeChunk(theme[curr_rows[i]][i].c);
 					free(theme[curr_rows[i]][i].buf);
 					++curr_rows[i];
-					while (theme[curr_rows[i]][i].valid && theme[curr_rows[i]][i].durr == 0)
+					while (theme[curr_rows[i]][i].valid && theme[curr_rows[i]][i].durr <= 0)
 						++curr_rows[i];
 
 					if (theme[curr_rows[i]][i].valid == 0) {
@@ -990,12 +992,16 @@ void audio_tick() {
 		}
 	}
 }
+int audioFrameCount = 0;
 
-void game_tick() {
-	++frames;
+
+
+void real_game_tick(){
 	SDL_Event event;
-
+        int startTicks = SDL_GetTicks();
+    ++audioFrameCount;
 	while (SDL_PollEvent(&event)) {
+
 
 		switch (event.type) {
 		case SDL_QUIT:
@@ -1135,13 +1141,31 @@ void game_tick() {
 	}
 
 
-	if(frames%2){
+	if(audioFrameCount % 2 == 0){
         audio_tick();
+        audioFrameCount = 0;
     }
 
-	sdl->draw();
+}
+
+void game_tick() {
+	++frames;
+
+    sdl->draw();
+    #ifdef EMCXX
+        real_game_tick();
+    #endif
 
 }
+#ifndef EMCXX
+void logic_loop(){
+    using namespace std::chrono_literals;
+    while(1){
+        real_game_tick();
+        std::this_thread::sleep_for(16ms);
+    }
+}
+#endif
 
 int main(int argc, char *argv[]) {
 
@@ -1162,6 +1186,7 @@ int main(int argc, char *argv[]) {
 #ifdef EMCXX
 	emscripten_set_main_loop(game_tick, 60, 1);
 #else
+    std::thread logicloop(logic_loop);
 	while (running) {
 
 		game_tick();
