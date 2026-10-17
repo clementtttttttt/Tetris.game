@@ -3,8 +3,7 @@
 #include <bitset>
 #include <iostream>
 #include <cstdlib>
-short past=0;
-short* randtone = ( short*)malloc(65536);
+short past = 0;
 
 unsigned int sfreq = 48000;
 
@@ -12,7 +11,7 @@ short* randtonegen(short mod, double volume, unsigned int *len,int smode){
     unsigned short lfsr = 2;
     unsigned short xorr;
     unsigned char high = 0;
-    randtone = ( short*)malloc(65536);
+    short* randtone = ( short*)malloc(65536);
     volume /=4;
 
     for(int i=0;i<32768;++i){

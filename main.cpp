@@ -352,8 +352,9 @@ SDL::SDL(Uint32 flags) {
 	Mix_OpenAudio(48000, AUDIO_S16LSB, 2, 256);
 	Uint16 format;
 	int channels;
-	extern int sfreq;
-	Mix_QuerySpec(&sfreq, &format, &channels);
+	int freq;
+	Mix_QuerySpec(&freq, &format, &channels);
+	sfreq = freq;
 
 	Mix_AllocateChannels(5);
 	SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
@@ -932,7 +933,14 @@ void audio_tick() {
 					s_eff_queue[i].front().buf = randtonegen(s_eff_queue[i].front().pitch, s_eff_queue[i].front().vol, &len, s_eff_queue[i].front().specval);
 				}
 				s_eff_queue[i].front().c = Mix_QuickLoad_RAW((Uint8 *)s_eff_queue[i].front().buf, len);
-				Mix_PlayChannel(-1, s_eff_queue[i].front().c, -1);
+				{
+					int buf_samples = len / sizeof(short);
+					int needed_samples = s_eff_queue[i].front().durr * sfreq / 60;
+					int nloops = needed_samples / buf_samples;
+					if (needed_samples % buf_samples > 0) nloops++;
+					if (nloops > 0) nloops--;
+					Mix_PlayChannel(-1, s_eff_queue[i].front().c, nloops);
+				}
 			}
 
 
@@ -969,7 +977,14 @@ void audio_tick() {
 						theme[curr_rows[i]][i].buf = randtonegen(theme[curr_rows[i]][i].pitch, theme[curr_rows[i]][i].vol, &len, theme[curr_rows[i]][i].specval);
 					}
 					theme[curr_rows[i]][i].c = Mix_QuickLoad_RAW((Uint8 *)theme[curr_rows[i]][i].buf, len);
-					Mix_PlayChannel(-1, theme[curr_rows[i]][i].c, -1);
+					{
+						int buf_samples = len / sizeof(short);
+						int needed_samples = theme[curr_rows[i]][i].durr * sfreq / 60;
+						int nloops = needed_samples / buf_samples;
+						if (needed_samples % buf_samples > 0) nloops++;
+						if (nloops > 0) nloops--;
+						Mix_PlayChannel(-1, theme[curr_rows[i]][i].c, nloops);
+					}
 				}
 
 

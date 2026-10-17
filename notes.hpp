@@ -6,6 +6,8 @@
 
 #include <SDL_mixer.h>
 
+extern unsigned int sfreq;
+
 enum notetypes{
     EMPTY, SQR, NOISE, TRI
 
