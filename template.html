@@ -3,7 +3,12 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Emscripten-Generated Code</title>
+    <title>Tetris.game</title>
+    <head>
+	<link rel="stylesheet" href="https://clementtttttttt.github.io/header.css">
+	 <link href="https://fonts.cdnfonts.com/css/nimbus-sans-l" rel="stylesheet">
+	 <link href="https://fonts.cdnfonts.com/css/frutiger" rel="stylesheet">
+	 <link href="https://fonts.cdnfonts.com/css/gill-sans-2" rel="stylesheet">
     <style>
       .emscripten { padding-right: 0; display: block;}
       textarea.emscripten { font-family: monospace; width: 80%; }
@@ -87,8 +92,15 @@
     </style>
   </head>
   <body>
-    <h2>Tetris.</h2>
-    <hr/>
+	 <header id="header">
+	  <div id="title">
+		<p>Tetris</p>
+	  </div>
+	</header>
+	<nav class="navbar">
+		<a id="gamez" href="/wasmgamez.html">Back</a>
+	</nav>
+
     <figure style="overflow:visible;" id="spinner"><div class="spinner"></div><center style="margin-top:0.5em"><strong>emscripten</strong></center></figure>
     <div class="emscripten" id="status">Downloading...</div>
     <div class="emscripten">
@@ -313,8 +325,8 @@
 		var c=document.getElementById("canvas");
 		c.focus();
 		
-		c.dispatchEvent(new KeyboardEvent('keydown', {'key': ' ', 'code': 'KeyR', 'keyCode': 32}));
-		c.dispatchEvent(new KeyboardEvent('keyup', {'key': ' ', 'code': 'KeyR', 'keyCode': 32}));
+		c.dispatchEvent(new KeyboardEvent('keydown', {'key': 'r', 'code': 'KeyR', 'keyCode': 82}));
+		c.dispatchEvent(new KeyboardEvent('keyup', {'key': 'r', 'code': 'KeyR', 'keyCode': 82}));
 	}
 	function onRC(){
 		var c=document.getElementById("canvas");
