@@ -1,18 +1,15 @@
 #include "notes.hpp"
-
-#include <bitset>
-#include <iostream>
-#include <cstdlib>
-short past = 0;
+#include<iostream>
+#include <vector>
 
 unsigned int sfreq = 48000;
 
-short* randtonegen(short mod, double volume, unsigned int *len,int smode){
+void songnote::randtonegen(short mod, double volume, unsigned int *len,int smode){
     unsigned short lfsr = 2;
     unsigned short xorr;
-    unsigned char high = 0;
-    short* randtone = ( short*)malloc(65536);
+    if (mod <= 0) mod = 1;
     volume /=4;
+    buf.resize(32768);
 
     for(int i=0;i<32768;++i){
             if(i%mod == 0){
@@ -25,40 +22,95 @@ short* randtonegen(short mod, double volume, unsigned int *len,int smode){
                  //   lfsr |= xorr<<6;
                 }
             }
-            randtone[i] = (!(lfsr&1))*32767*volume;
+            buf[i] = (!(lfsr&1))*32767*volume;
 
       //  printf("%i\n",randtone[i]);
     }
-    *len = 65536;
-    //chunks.push_back(Mix_QuickLoad_RAW((unsigned char*)tone,65536));
-    return randtone;
+    *len = (unsigned int)(buf.size() * sizeof(short));
 }
 
-short* sqrtonegen(unsigned int freq, unsigned int duty, double volume, unsigned int *len){
-    short* buf = ( short* )malloc(sfreq/freq*2);
+
+void songnote::play() {
+					playin = 1;
+					durrcount = durr;
+	unsigned int len = 0;
+	switch (type) {
+	case SQR:
+		sqrtonegen(pitch,vol, &len, specval);
+		break;
+	case TRI:
+		tritonegen(pitch, vol, &len);
+		break;
+	case NOISE:
+		randtonegen((short)pitch, vol, &len, (int)specval);
+		break;
+	default:
+		return;
+	}
+
+	if (buf.empty()) {
+
+		return;
+	}
+	if(vol != 0){
+	std::cout << vol<<std::endl;}
+
+	Mix_Chunk* ch = Mix_QuickLoad_RAW(reinterpret_cast<Uint8 *>(buf.data()), len);
+
+    c.reset(ch); //sets unique pointer thingy to have that chunk
+
+	if (!c) {
+		buf.clear();
+		return;
+	}
+
+	std::size_t buf_samples = buf.size();
+	unsigned long long needed = (unsigned long long)durr * sfreq / 60ULL;
+	unsigned long long nloops = 0;
+	if (buf_samples > 0) {
+		nloops = needed / buf_samples;
+		if (needed % buf_samples > 0)
+			++nloops;
+		if (nloops > 0)
+			--nloops;
+	}
+
+	Mix_PlayChannel(-1, c.get(), (int)nloops);
+}
+
+void songnote::sqrtonegen(unsigned int freq,  double volume, unsigned int *len,unsigned int duty){
+    if (freq == 0) freq = 1;
+    buf.resize(sfreq/freq);
     volume /=4;
-    for(int i=0; i<sfreq/freq;++i){
-        if(i<sfreq/freq*duty/100){
+    for(std::size_t i=0; i<buf.size();++i){
+        if(i<buf.size()*duty/100){
             buf[i]=32767 * volume;
         }
         else buf[i]=-32767 * volume;
     }
 
-    *len = sfreq/freq*2;
-    //chunks.push_back(Mix_QuickLoad_RAW((unsigned char*)buf,sfreq/freq*2));
-    return buf;
+    *len = (unsigned int)(buf.size() * sizeof(short));
+}
+void songnote::stop(){
+
+            playin=0;
+            durrcount=0;
+            c.reset(nullptr);
+            buf.clear();
 }
 
-short* tritonegen(unsigned int freq, double volume, unsigned int *len){
-    short* buf = ( short* )malloc(((sfreq/freq) + (sfreq/freq))*2);
+void songnote::tritonegen(unsigned int freq, double volume, unsigned int *len){
+    if (freq == 0) freq = 1;
+    std::size_t n = sfreq/freq;
+    buf.resize(n * 2);
     volume /=4;
 
-    double step = (32768/(sfreq/freq/2)) * volume;
+    double step = (32768/(n/2)) * volume;
     double counter = 0;
 
     for(int dir=0; dir<2; ++dir){
-        for(int i=(sfreq/freq*dir)+5; i<sfreq/freq+(sfreq/freq*dir)+5;++i){
-            if((i-(sfreq/freq*dir)) < (sfreq/freq/2)){
+        for(std::size_t i=(n*dir)+5; i<n+(n*dir)+5;++i){
+            if((i-(n*dir)) < (n/2)){
                 buf[i-5] = counter = (dir==1 ? counter + step : counter - step);
 
             }
@@ -67,7 +119,5 @@ short* tritonegen(unsigned int freq, double volume, unsigned int *len){
             }
         }
     }
-    *len = ((sfreq/freq) + (sfreq/freq))*2 ;
-    //chunks.push_back(Mix_QuickLoad_RAW((unsigned char*)buf,sfreq/freq*2));
-    return buf;
+    *len = (unsigned int)(buf.size() * sizeof(short));
 }

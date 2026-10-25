@@ -5,6 +5,10 @@
 //    Ex: C5S = C# note in 5th octave
 
 #include <SDL_mixer.h>
+#include <memory>
+#include <vector>
+#include <iostream>
+#include <array>
 
 extern unsigned int sfreq;
 
@@ -13,19 +17,73 @@ enum notetypes{
 
 };
 
-struct songnote{
-    unsigned int valid;
-    unsigned int type;
+struct Mix_ChunkDeleter {
+    void operator()(Mix_Chunk *chunk) const {
+        if (chunk != nullptr) Mix_FreeChunk(chunk);
+    }
+};
+
+using Mix_ChunkPtr = std::unique_ptr<Mix_Chunk, Mix_ChunkDeleter>;
+
+class songnote{
+    bool valid;
+    notetypes type;
     unsigned int pitch;
-    unsigned int durr;
+    const unsigned int durr ;
     unsigned int specval;
     double vol;
-     int durrcount;
+    int durrcount;
     unsigned int playin;
-    short* buf;
-    Mix_Chunk *c;
+    std::vector<short> buf;
+    Mix_ChunkPtr c;
     int channel;
+    void randtonegen(short mod, double volume, unsigned int *len,int smode);
+    void sqrtonegen(unsigned int freq,  double volume, unsigned int *len,unsigned int duty);
+void tritonegen(unsigned int freq, double volume, unsigned int *len);
+    public:
+    bool isNotPlaying(){
+        return playin == 0 && durrcount == 0;
+    }
 
+    bool finishedPlaying(){
+        return durrcount <= 0;
+    }
+
+    bool isPadNote(){
+        return durr <= 0;
+    }
+
+    void tick(){
+        if (isNotPlaying()) {
+			play();
+		}
+        durrcount -= 2;
+        if(finishedPlaying()){
+            stop();
+        }
+    }
+    bool isValid(){
+        return valid;
+    }
+    void stop();
+    songnote(notetypes atype, unsigned int bpitch,  unsigned int const cdurr, unsigned int dspecval, double evol):durr(cdurr) {
+        type=atype;
+        pitch=bpitch;
+        specval=dspecval;
+        vol=evol;
+
+        durrcount=0;
+        valid=true;
+        playin=0;
+
+    }
+    songnote():durr(0){
+        songnote(EMPTY,0,0,0,0);
+        valid=false;
+
+
+    }
+    void play();
 
 };
 
@@ -206,9 +264,7 @@ struct songnote{
 
 #define DSN(type, freq, durr, spv,vol) {1,type, freq,durr, spv, vol,0}
 
-short* sqrtonegen(unsigned int freq, unsigned int duty, double volume, unsigned int *len);
-short* tritonegen(unsigned int freq, double volume, unsigned int *len);
-short* randtonegen(short mod, double volume, unsigned int *len,int smode);
+
 /* Examples:
  *
  * #include <Windows.h>
