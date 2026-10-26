@@ -546,6 +546,7 @@ static int harddropped = 0;
 
 static int s_cancelled = 0;
 static int softd = 0;
+static int soft_drop_request = 0;
 
 static int starta=0, startd=0, starts=0,sd=0;
 
@@ -562,7 +563,8 @@ static void drop_tick() {
 	if (checkz == 0) {
 		checkz = 10;
 	}
-	if ((frames-sd*starts) % checkz == 0 || harddropped || frames == 1) {
+	if ((frames-sd*starts) % checkz == 0 || harddropped || frames == 1 || soft_drop_request) {
+		soft_drop_request = 0;
 		if (chk_collision(0, -1)) {
 			spawn = 1;
 			movep(px, py, px, py);
@@ -636,6 +638,7 @@ void st_maingame::tick() {
 					break;
                 case SDLK_s:
 					starts=frames;
+					soft_drop_request = 1;
 					break;
 				case SDLK_SPACE:
 				case SDLK_r:
