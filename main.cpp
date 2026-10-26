@@ -67,10 +67,16 @@ static void game_tick(void *userdata) {
 
 #ifndef EMCXX
 static void logic_loop(state_machine *sm) {
-	using namespace std::chrono_literals;
+	using clock = std::chrono::steady_clock;
+	const auto step = std::chrono::duration_cast<clock::duration>(std::chrono::duration<double>(1.0 / 60.0));
+	auto next = clock::now();
 	while (1) {
 		sm->tick();
-		std::this_thread::sleep_for(16ms);
+		next += step;
+		if (next > clock::now())
+			std::this_thread::sleep_until(next);
+		else
+			next = clock::now();
 	}
 }
 #endif

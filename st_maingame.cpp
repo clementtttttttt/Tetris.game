@@ -1,6 +1,8 @@
 #include "st_maingame.hpp"
 #include <iostream>
 #include "notes.hpp"
+#include "sound_effects.hpp"
+#include "theme.hpp"
 #include "tetris.hpp"
 
 #include <SDL.h>
@@ -45,263 +47,7 @@ static int coll_tee[4][8] = {{0, 0, 0, 1, 1, 0, -1, 0}, {0, 1, 0, 0, 0, -1, 1, 0
 
 static int coll_zed[4][8] = {{0, 0, 0, 1, -1, 1, 1, 0}, {1, 1, 0, 0, 1, 0, 0, -1}, {0, 0, -1, 0, 0, -1, 1, -1}, {0, 1, -1, 0, 0, 0, -1, -1}};
 
-#define TEMPO 149
-
-#define n_val 5
-
-static songnote theme[][4]{{songnote(SQR, B3, (EIGHTH - SIXTEENTH), 50, 0), songnote(SQR, B3, (EIGHTH - SIXTEENTH), 50, 0), songnote(TRI, E2, (EIGHTH - SIXTEENTH), 50, 0), songnote(NOISE, E2, (EIGHTH - SIXTEENTH), 50, 0)},
-			   {songnote(SQR, E4, EIGHTH, 50, 0.3), songnote(SQR, G3S, EIGHTH, 50, 0.3), songnote(TRI, E2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, E3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0.3), songnote(SQR, G3S, EIGHTH, 50, 0.3), songnote(TRI, E2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(TRI, E3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, D4, EIGHTH, 50, 0.3), songnote(SQR, B3, EIGHTH, 50, 0.3), songnote(TRI, E2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, E3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(TRI, E2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0.3), songnote(SQR, G3S, EIGHTH, 50, 0.3), songnote(TRI, E3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(SQR, E3, EIGHTH, 50, 0.3), songnote(TRI, A2, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(SQR, E3, EIGHTH, 50, 0.3), songnote(TRI, A2, EIGHTH, 50, 0.7), songnote(NOISE, E2, (EIGHTH + EIGHTH / 2), 50, 0)},
-			   {songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, E4, EIGHTH, 50, 0.3), songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(TRI, A2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, D4, EIGHTH, 50, 0.3), songnote(SQR, B3, EIGHTH, 50, 0.3), songnote(TRI, A2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0.3), songnote(SQR, G3S, EIGHTH, 50, 0.3), songnote(TRI, G2S, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, G3S, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0.3), songnote(SQR, G3S, EIGHTH, 50, 0.3), songnote(TRI, G2S, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(TRI, G3S, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, D4, EIGHTH, 50, 0.3), songnote(SQR, B3, EIGHTH, 50, 0.3), songnote(TRI, E2, EIGHTH, 50, 0.7), songnote(NOISE, E2, (EIGHTH + SIXTEENTH), 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, E3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, E4, EIGHTH, 50, 0.3), songnote(SQR, G3S, EIGHTH, 50, 0.3), songnote(TRI, E2, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, E3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(TRI, A2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val + 4, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(SQR, E3, EIGHTH, 50, 0.3), songnote(TRI, A2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(SQR, E3, EIGHTH, 50, 0.3), songnote(TRI, A2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, B2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, C3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, (SIXTEENTH + EIGHTH), 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, D2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, D4, EIGHTH, 50, 0.3), songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(TRI, D3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, D3, EIGHTH, 50, 0), songnote(TRI, D2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, F4, EIGHTH, 50, 0.3), songnote(SQR, D4, EIGHTH, 50, 0.3), songnote(TRI, D3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, A4, EIGHTH, 50, 0.3), songnote(SQR, F4, EIGHTH, 50, 0.3), songnote(TRI, D2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, D3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, G4, EIGHTH, 50, 0.3), songnote(SQR, E4, EIGHTH, 50, 0.3), songnote(TRI, D2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, F4, EIGHTH, 50, 0.3), songnote(SQR, D4, EIGHTH, 50, 0.3), songnote(TRI, D3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, E4, EIGHTH, 50, 0.3), songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(TRI, C2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, C3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, C2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(TRI, C3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, E4, EIGHTH, 50, 0.3), songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(TRI, C2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, C3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, D4, EIGHTH, 50, 0.3), songnote(SQR, B3, EIGHTH, 50, 0.3), songnote(TRI, C2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(TRI, C3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0.3), songnote(SQR, G3S, EIGHTH, 50, 0.3), songnote(TRI, B2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, B3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0.3), songnote(SQR, G3S, EIGHTH, 50, 0.3), songnote(TRI, B2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(TRI, B3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, D4, EIGHTH, 50, 0.3), songnote(SQR, B3, EIGHTH, 50, 0.3), songnote(TRI, E2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, E3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, E4, EIGHTH, 50, 0.3), songnote(SQR, G3S, EIGHTH, 50, 0.3), songnote(TRI, E2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, E3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(TRI, A2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(SQR, E3, EIGHTH, 50, 0.3), songnote(TRI, E2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, E3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(SQR, E3, EIGHTH, 50, 0.3), songnote(TRI, A2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, E2, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, E2, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, E2, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, E2, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, B3, (SIXTEENTH + EIGHTH), 50, 0), songnote(SQR, B3, (SIXTEENTH + EIGHTH), 50, 0), songnote(TRI, E2, (EIGHTH + SIXTEENTH), 50, 0), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, (EIGHTH - SIXTEENTH), 50, 0), songnote(SQR, B3, (EIGHTH - SIXTEENTH), 50, 0), songnote(TRI, E2, (EIGHTH - SIXTEENTH), 50, 0), songnote(NOISE, E2, (EIGHTH - SIXTEENTH), 50, 0)},
-			   {songnote(SQR, E4, EIGHTH, 50, 0.3), songnote(SQR, G3S, EIGHTH, 50, 0.3), songnote(TRI, E2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, E3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0.3), songnote(SQR, G3S, EIGHTH, 50, 0.3), songnote(TRI, E2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(TRI, E3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, D4, EIGHTH, 50, 0.3), songnote(SQR, B3, EIGHTH, 50, 0.3), songnote(TRI, E2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, E3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(TRI, E2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0.3), songnote(SQR, G3S, EIGHTH, 50, 0.3), songnote(TRI, E3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(SQR, E3, EIGHTH, 50, 0.3), songnote(TRI, A2, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(SQR, E3, EIGHTH, 50, 0.3), songnote(TRI, A2, EIGHTH, 50, 0.7), songnote(NOISE, E2, (EIGHTH + EIGHTH / 2), 50, 0)},
-			   {songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, E4, EIGHTH, 50, 0.3), songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(TRI, A2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, D4, EIGHTH, 50, 0.3), songnote(SQR, B3, EIGHTH, 50, 0.3), songnote(TRI, A2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0.3), songnote(SQR, G3S, EIGHTH, 50, 0.3), songnote(TRI, G2S, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, G3S, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0.3), songnote(SQR, G3S, EIGHTH, 50, 0.3), songnote(TRI, G2S, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(TRI, G3S, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, D4, EIGHTH, 50, 0.3), songnote(SQR, B3, EIGHTH, 50, 0.3), songnote(TRI, E2, EIGHTH, 50, 0.7), songnote(NOISE, E2, (EIGHTH + SIXTEENTH), 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, E3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, E4, EIGHTH, 50, 0.3), songnote(SQR, G3S, EIGHTH, 50, 0.3), songnote(TRI, E2, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, E3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(TRI, A2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val + 4, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(SQR, E3, EIGHTH, 50, 0.3), songnote(TRI, A2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(SQR, E3, EIGHTH, 50, 0.3), songnote(TRI, A2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, B2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, C3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, (SIXTEENTH + EIGHTH), 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, D2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, D4, EIGHTH, 50, 0.3), songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(TRI, D3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, D3, EIGHTH, 50, 0), songnote(TRI, D2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, F4, EIGHTH, 50, 0.3), songnote(SQR, D4, EIGHTH, 50, 0.3), songnote(TRI, D3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, A4, EIGHTH, 50, 0.3), songnote(SQR, F4, EIGHTH, 50, 0.3), songnote(TRI, D2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, D3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, G4, EIGHTH, 50, 0.3), songnote(SQR, E4, EIGHTH, 50, 0.3), songnote(TRI, D2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, F4, EIGHTH, 50, 0.3), songnote(SQR, D4, EIGHTH, 50, 0.3), songnote(TRI, D3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, E4, EIGHTH, 50, 0.3), songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(TRI, C2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, C3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, C2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(TRI, C3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, E4, EIGHTH, 50, 0.3), songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(TRI, C2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, C3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, D4, EIGHTH, 50, 0.3), songnote(SQR, B3, EIGHTH, 50, 0.3), songnote(TRI, C2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(TRI, C3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0.3), songnote(SQR, G3S, EIGHTH, 50, 0.3), songnote(TRI, B2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, B3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0.3), songnote(SQR, G3S, EIGHTH, 50, 0.3), songnote(TRI, B2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(TRI, B3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, D4, EIGHTH, 50, 0.3), songnote(SQR, B3, EIGHTH, 50, 0.3), songnote(TRI, E2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, E3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, E4, EIGHTH, 50, 0.3), songnote(SQR, G3S, EIGHTH, 50, 0.3), songnote(TRI, E2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, E3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, C4, EIGHTH, 50, 0.3), songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(TRI, A2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(SQR, E3, EIGHTH, 50, 0.3), songnote(TRI, E2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, E3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, A3, EIGHTH, 50, 0.3), songnote(SQR, E3, EIGHTH, 50, 0.3), songnote(TRI, A2, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, EIGHTH, 50, 0), songnote(SQR, B3, EIGHTH, 50, 0), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, E2, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, E2, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, E2, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, E2, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, 0, 50, 0), songnote(SQR, B3, 0, 50, 0), songnote(TRI, A3, 0, 50, 0.7), songnote(NOISE, E2, EIGHTH / 2, 50, 0)},
-			   {songnote(SQR, B3, (SIXTEENTH + EIGHTH), 50, 0), songnote(SQR, B3, (SIXTEENTH + EIGHTH), 50, 0), songnote(TRI, E2, (EIGHTH + SIXTEENTH), 50, 0), songnote(NOISE, n_val, EIGHTH / 2, 50, 0.3)},
-			   {songnote(SQR, B3, (EIGHTH - SIXTEENTH), 50, 0), songnote(SQR, B3, (EIGHTH - SIXTEENTH), 50, 0), songnote(TRI, E2, (EIGHTH - SIXTEENTH), 50, 0), songnote(NOISE, E2, (EIGHTH + SIXTEENTH), 50, 0)},
-			   {songnote(SQR, E3, HALF, 50, 0.3), songnote(SQR, C3, HALF, 50, 0.3), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, E4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, E4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, C3, HALF, 50, 0.3), songnote(SQR, A2, HALF, 50, 0.3), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, E4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, E4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0)},
-			   {songnote(SQR, D3, HALF, 50, 0.3), songnote(SQR, B2, HALF, 50, 0.3), songnote(TRI, G3S, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, G3S, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, B2, HALF, 50, 0.3), songnote(SQR, G2S, HALF, 50, 0.3), songnote(TRI, G3S, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, G3S, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0)},
-			   {songnote(SQR, C3, HALF, 50, 0.3), songnote(SQR, A2, HALF, 50, 0.3), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, E4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, E4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, A2, HALF, 50, 0.3), songnote(SQR, F2, HALF, 50, 0.3), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, E4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 00)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, E4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, G2S, HALF, 50, 0.3), songnote(SQR, E2, HALF, 50, 0.3), songnote(TRI, G3S, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, G3S, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0)},
-			   {songnote(SQR, B2, (QUARTER + EIGHTH), 50, 0.3), songnote(SQR, G2S, (QUARTER + EIGHTH), 50, 0.3), songnote(TRI, G3S, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, G3S, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, B2, EIGHTH, 50, 0), songnote(SQR, C3, EIGHTH, 50, 0.0), songnote(TRI, D4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, E3, HALF, 50, 0.3), songnote(SQR, C3, HALF, 50, 0.3), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, E4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, E4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0)},
-			   {songnote(SQR, C3, HALF, 50, 0.3), songnote(SQR, A2, HALF, 50, 0.3), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, E4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, E4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, D3, HALF, 50, 0.3), songnote(SQR, B2, HALF, 50, 0.3), songnote(TRI, G3S, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, G3S, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, B2, HALF, 50, 0.3), songnote(SQR, G2S, HALF, 50, 0.3), songnote(TRI, G3S, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, G3S, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0)},
-			   {songnote(SQR, C3, QUARTER, 50, 0.3), songnote(SQR, A2, QUARTER, 50, 0.3), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, E4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, E3, QUARTER, 50, 0.3), songnote(SQR, C3, QUARTER, 50, 0.3), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, E4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, A3, HALF, 50, 0.3), songnote(SQR, E3, HALF, 50, 0.3), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, E4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, A3, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, E4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0)},
-			   {songnote(SQR, G3S, HALF, 50, 0.3), songnote(SQR, D3, HALF, 50, 0.3), songnote(TRI, G3S, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, G3S, EIGHTH, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, EIGHTH, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, 0, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, 0, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, 0, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, 0, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, 0, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, 0, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, 0, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, 0, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, 0, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, 0, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, 0, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, 0, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, 0, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, 0, 50, 0.7), songnote(NOISE, n_val, EIGHTH * 3 / 2, 50, 0)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, 0, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, 0, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, 0, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, 0, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, 0, 50, 0.7), songnote(NOISE, n_val, SIXTEENTH, 50, 0.3)},
-			   {songnote(SQR, E3, 0, 50, 0.3), songnote(SQR, C3, 0, 50, 0.3), songnote(TRI, D4, 0, 50, 0.7), songnote(NOISE, n_val, 0, 50, 0)},
-			   {songnote(SQR, E3, QUARTER, 50, 0), songnote(SQR, C3, QUARTER, 50, 0), songnote(TRI, G3S, EIGHTH, 50, 0.7), songnote(NOISE, n_val, 0, 50, 0)},
-			   {songnote(SQR, B3, (SIXTEENTH + EIGHTH), 50, 0), songnote(SQR, B3, (SIXTEENTH + EIGHTH), 50, 0), songnote(TRI, E2, (EIGHTH + EIGHTH + SIXTEENTH), 50, 0), songnote(NOISE, n_val, 0, 50, 0.3)},
-
-			   {songnote()}};
-
-#undef TEMPO
-
-static int curr_rows[4] = {0, 0, 0, 0};
+static const int autorepeat_period_frames=2;
 
 static int piece_or = 1, old_piece_or = 1;
 
@@ -322,9 +68,7 @@ static int score = 0, level = 1;
 
 static int fly[4];
 
-static std::queue<struct songnote> s_eff_queue[4];
-
-static void s_beep(float len_ims, unsigned int freq, unsigned int channel = 0, double vol = 0.5) { s_eff_queue[channel].push(songnote(SQR, freq, (unsigned int)(len_ims / 1000 * 60), 50, vol)); }
+static void s_beep(float len_ims, unsigned int freq, unsigned int channel = 0, double vol = 0.5) { sound_effects::instance().play(len_ims, freq, channel, vol); }
 static int clearing = 0;
 static int played_p = 0, played_s = 0;
 
@@ -374,7 +118,7 @@ static void f_update() {
 	score += fill_score_sum;
 }
 
-static int stop_music = 0;
+static theme background_music;
 
 static void drawText(SDL_Renderer *screen, char *str, int x, int y, int sz, SDL_Color fgC, SDL_Color bgC, int leftanchor) {
 
@@ -403,24 +147,9 @@ static int gameover = 0;
 
 static int fillcounter = 23;
 
-static void stopbgm() {
-	stop_music = 1;
-	curr_rows[0] = 0;
-	curr_rows[1] = 0;
-	curr_rows[2] = 0;
-	curr_rows[3] = 0;
-	for(int x=0;x<4;x++){
-        for(int y=0;theme[y][x].isValid();++y){
-            theme[y][x].stop();
-
-        }
-	}
-	Mix_HaltChannel(-1);
-}
 static int pause=0;
 
 void st_maingame::frame() {
-	++frames;
 }
 
 void st_maingame::draw() {
@@ -529,7 +258,7 @@ void st_maingame::draw() {
 			}
 		}
 	}
-	if ((frames - frames_old) > 14 && (frames - frames_old) <= 28) {
+	if ((frames - frames_old) > 14 && frames_old != 0) {
 		SDL_SetRenderDrawColor(sdl->m_renderer, 0, 0, 0, 255);
 		played_p = 0;
 		if (!played_s) {
@@ -540,7 +269,7 @@ void st_maingame::draw() {
 			SDL_Rect filled = {230, 574 - 26 - fly[fl2] * 26, 10 * 26, 26};
 			SDL_RenderFillRect(sdl->m_renderer, &filled);
 		}
-		if ((frames - frames_old) == 28) {
+		if ((frames - frames_old) >= 28) {
 			while (fl3) {
 				--fl3;
 				for (int y = fly[fl3] + 1; y < 24; ++y) {
@@ -612,26 +341,27 @@ static void movep(int oldx, int oldy, int x, int y, int isghost = 0) {
 	}
 
 	for (int i = 0; i < 4; ++i) {
-        if(((*collm)[old_piece_or - 1][i * 2] + oldx) >9){
-            continue;
-        }
-#define lhs (blocks2[(*collm)[old_piece_or - 1][i * 2] + oldx][(*collm)[old_piece_or - 1][i * 2 + 1] + oldy])
-		lhs = {0, 0, 0, 0};
-#undef lhs
+		int ix = (*collm)[old_piece_or - 1][i * 2] + oldx;
+		int iy = (*collm)[old_piece_or - 1][i * 2 + 1] + oldy;
+		if (ix < 0 || ix > 9 || iy < 0 || iy >= 40)
+			continue;
+		blocks2[ix][iy] = {0, 0, 0, 0};
 	}
 	for (int i = 0; i < 4; ++i) {
-#define lhs (blocks2[(*collm)[piece_or - 1][i * 2] + x][(*collm)[piece_or - 1][i * 2 + 1] + y])
+		int ix = (*collm)[piece_or - 1][i * 2] + x;
+		int iy = (*collm)[piece_or - 1][i * 2 + 1] + y;
+		if (ix < 0 || ix > 9 || iy < 0 || iy >= 40)
+			continue;
 		if (isghost) {
-			if (lhs.a != 0xff) {
-				lhs.r = piece_colours[curr_piece - 1].r;
-				lhs.g = piece_colours[curr_piece - 1].g;
-				lhs.b = piece_colours[curr_piece - 1].b;
-				lhs.a |= 0x88;
+			if (blocks2[ix][iy].a != 0xff) {
+				blocks2[ix][iy].r = piece_colours[curr_piece - 1].r;
+				blocks2[ix][iy].g = piece_colours[curr_piece - 1].g;
+				blocks2[ix][iy].b = piece_colours[curr_piece - 1].b;
+				blocks2[ix][iy].a |= 0x88;
 			}
 		} else {
-			lhs = piece_colours[curr_piece - 1];
+			blocks2[ix][iy] = piece_colours[curr_piece - 1];
 		}
-#undef lhs
 	}
 	old_piece_or = piece_or;
 }
@@ -758,7 +488,7 @@ static void piece_spawn() {
 
 	if (chk_collision(0,-1)) {
 		gameover = 1;
-		stopbgm();
+		background_music.stop();
 
 		return;
 	}
@@ -792,7 +522,6 @@ static void rotate_piece(int left) {
 	movep(px, py, px, py);
 	s_beep(50, C5);
 	s_beep(50, C4);
-
 	s_beep(50, A4);
 	s_beep(50, B4);
 	s_beep(50, C5);
@@ -863,41 +592,8 @@ static int w_up = 1, q_up = 1;
 
 
 static void audio_tick() {
-	for (int i = 0; i < 4; ++i) {
-		std::queue<songnote> &q = s_eff_queue[i];
-		if (q.empty()) {
-			continue;
-		}
-
-		songnote &note = q.front();
-
-		note.tick();
-
-		if (note.finishedPlaying()) {
-			q.pop();
-		}
-	}
-
-	if (!stop_music && !pause) {
-		for (int i = 0; i < 4; ++i) {
-			if (theme[curr_rows[i]][i].isValid()) {
-
-				songnote &note = theme[curr_rows[i]][i];
-				note.tick();
-				if (note.finishedPlaying() ) {
-
-					++curr_rows[i];
-					while (theme[curr_rows[i]][i].isValid() && theme[curr_rows[i]][i].isPadNote())
-						++curr_rows[i];
-
-					if (!theme[curr_rows[i]][i].isValid() ) {
-
-						curr_rows[i] = 0;
-					}
-				}
-			}
-		}
-	}
+	sound_effects::instance().tick();
+	background_music.tick();
 }
 static int audioFrameCount = 0;
 
@@ -906,6 +602,7 @@ static int audioFrameCount = 0;
 void st_maingame::tick() {
 	SDL_Event event;
         int startTicks = SDL_GetTicks();
+    ++frames;
     ++audioFrameCount;
 	while (SDL_PollEvent(&event)) {
 
@@ -915,7 +612,7 @@ void st_maingame::tick() {
 			running = 0;
 			break;
 		case SDL_KEYDOWN:
-			if (frames > 30) {
+			if (frames > 30 && event.key.repeat == 0) {
 				switch (event.key.keysym.sym) {
 				case SDLK_w:
 					if (w_up) {
@@ -932,7 +629,7 @@ void st_maingame::tick() {
 					}
 					break;
 				case SDLK_a:
-					starta=frames;
+					starta =frames;
 					break;
                 case SDLK_d:
 					startd=frames;
@@ -964,21 +661,17 @@ void st_maingame::tick() {
                         te_bag.clear();
                         fill_te_bag();
                         fillcounter = 23;
-                        stop_music=0;
+                        background_music.resume();
                     }
                     break;
                 case SDLK_m:
-                    if(!pause){
-                    if(stop_music){
-                            stop_music=0;
-
-                    }
-                    else stopbgm();
-                    }
+                    if(!pause)
+                        background_music.toggle();
                 break;
                 case SDLK_F1:
                     if(!pause){
                         pause=1;
+                        background_music.set_paused(true);
                         Mix_HaltChannel(-1);
                         s_beep(90,C5,1,0.2);
                         s_beep(90,C6,1,0.2);
@@ -988,6 +681,7 @@ void st_maingame::tick() {
                     }
                     else{
                         pause=0;
+                        background_music.set_paused(false);
 
                     }
 				}
@@ -1028,12 +722,12 @@ void st_maingame::tick() {
 		const Uint8 *keyst = SDL_GetKeyboardState(NULL);
 
 		if (keyst[SDL_SCANCODE_A]) {
-			if (((frames-starta) % 3 == 0)&&((frames-starta)>=12)||((frames-starta)==0)) {
+			if (((frames-starta) % autorepeat_period_frames == 0)&&((frames-starta)>=10)||((frames-starta)==0)) {
 				key_move_piece(px, py, px - 1, py);
 			}
 		}
 		if (keyst[SDL_SCANCODE_D]) {
-			if (((frames-startd) % 3 == 0)&&((frames-startd)>=12)||((frames-startd)==0)) {
+			if (((frames-startd) % autorepeat_period_frames == 0)&&((frames-startd)>=10)||((frames-startd)==0)) {
 				key_move_piece(px, py, px + 1, py);
 			}
 		}

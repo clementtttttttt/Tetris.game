@@ -5,11 +5,12 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <cmath>
+#include <cstring>
 
 static const char title_text[] = "Tetris.game ";
 static constexpr int title_len = (int)(sizeof(title_text) - 1);
 static constexpr float two_pi = 6.2831853f;
-static constexpr float spin_speed = 1.3f;
+static constexpr float spin_speed = 1.7f;
 
 enum title_action {
 	ACTION_START
@@ -22,13 +23,32 @@ struct title_button {
 };
 
 static const title_button title_buttons[] = {
-	{"START", {260, 320, 200, 64}, ACTION_START},
+	{"start\n(RClockw)", {260, 320, 200, 64}, ACTION_START},
 };
 
 static const int title_button_count = (int)(sizeof(title_buttons) / sizeof(title_buttons[0]));
 
-static void drawTextCentered(SDL_Renderer *renderer, const char *text, int center_x, int y, int size, SDL_Color color) {
-	SDL_Surface *surface = TTF_RenderText_Solid(font, text, color);
+static const char *control_hints[] = {"W/Q   ROTATE", "A/D   MOVE", "S     SOFT DROP", "SPACE HARD DROP", "F1    PAUSE"};
+static const int control_hint_count = (int)(sizeof(control_hints) / sizeof(control_hints[0]));
+
+static int countLines(const char *text) {
+	int count = 1;
+	for (const char *p = text; *p; ++p) {
+		if (*p == '\n' && p[1] != '\0')
+			++count;
+	}
+	return count;
+}
+
+static void drawTextLine(SDL_Renderer *renderer, const char *text, int length, int center_x, int y, int size, SDL_Color color) {
+	char buffer[256];
+	if (length >= (int)sizeof(buffer))
+		length = (int)sizeof(buffer) - 1;
+	for (int i = 0; i < length; ++i)
+		buffer[i] = text[i];
+	buffer[length] = '\0';
+
+	SDL_Surface *surface = TTF_RenderText_Solid(font, buffer, color);
 	if (!surface)
 		return;
 	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
@@ -38,6 +58,37 @@ static void drawTextCentered(SDL_Renderer *renderer, const char *text, int cente
 	}
 	int width = surface->h > 0 ? surface->w * size / surface->h : surface->w;
 	SDL_Rect dst = {center_x - width / 2, y, width, size};
+	SDL_RenderCopy(renderer, texture, NULL, &dst);
+	SDL_DestroyTexture(texture);
+	SDL_FreeSurface(surface);
+}
+
+static void drawTextCentered(SDL_Renderer *renderer, const char *text, int center_x, int y, int size, SDL_Color color) {
+	const char *line = text;
+	int line_y = y;
+	for (;;) {
+		const char *newline = std::strchr(line, '\n');
+		int length = newline ? (int)(newline - line) : (int)std::strlen(line);
+		if (length > 0)
+			drawTextLine(renderer, line, length, center_x, line_y, size, color);
+		if (!newline)
+			break;
+		line = newline + 1;
+		line_y += size;
+	}
+}
+
+static void drawTextRight(SDL_Renderer *renderer, const char *text, int right_x, int y, int size, SDL_Color color) {
+	SDL_Surface *surface = TTF_RenderText_Solid(font, text, color);
+	if (!surface)
+		return;
+	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+	if (!texture) {
+		SDL_FreeSurface(surface);
+		return;
+	}
+	int width = surface->h > 0 ? surface->w * size / surface->h : surface->w;
+	SDL_Rect dst = {right_x - width, y, width, size};
 	SDL_RenderCopy(renderer, texture, NULL, &dst);
 	SDL_DestroyTexture(texture);
 	SDL_FreeSurface(surface);
@@ -175,8 +226,16 @@ void st_titlescreen::draw() {
 		SDL_RenderDrawRect(renderer, &inner);
 		SDL_RenderDrawRect(renderer, &button.rect);
 
-		drawTextCentered(renderer, button.label, button.rect.x + button.rect.w / 2,
-				 button.rect.y + (button.rect.h - 26) / 2, 26, {0, 0, 0, 0xff});
+		const int text_size = 26;
+		int text_top = button.rect.y + (button.rect.h - countLines(button.label) * text_size) / 2;
+		drawTextCentered(renderer, button.label, button.rect.x + button.rect.w / 2, text_top, text_size, {0, 0, 0, 0xff});
+	}
+
+	const int hint_size = 18;
+	int hint_y = 556 - control_hint_count * hint_size;
+	for (int i = 0; i < control_hint_count; ++i) {
+		drawTextRight(renderer, control_hints[i], 700, hint_y, hint_size, {0xcc, 0xcc, 0xcc, 0xff});
+		hint_y += hint_size;
 	}
 
 	SDL_RenderPresent(renderer);

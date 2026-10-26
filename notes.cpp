@@ -53,12 +53,9 @@ void songnote::play() {
 
 		return;
 	}
-	if(vol != 0){
-	std::cout << vol<<std::endl;}
 
-	Mix_Chunk* ch = Mix_QuickLoad_RAW(reinterpret_cast<Uint8 *>(buf.data()), len);
+	c = Mix_QuickLoad_RAW(reinterpret_cast<Uint8 *>(buf.data()), len);
 
-    c.reset(ch); //sets unique pointer thingy to have that chunk
 
 	if (!c) {
 		buf.clear();
@@ -76,7 +73,7 @@ void songnote::play() {
 			--nloops;
 	}
 
-	Mix_PlayChannel(-1, c.get(), (int)nloops);
+	Mix_PlayChannel(-1, c, (int)nloops);
 }
 
 void songnote::sqrtonegen(unsigned int freq,  double volume, unsigned int *len,unsigned int duty){
@@ -96,7 +93,8 @@ void songnote::stop(){
 
             playin=0;
             durrcount=0;
-            c.reset(nullptr);
+            Mix_FreeChunk(c);
+            c = nullptr;
             buf.clear();
 }
 

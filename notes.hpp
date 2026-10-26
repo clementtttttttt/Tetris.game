@@ -1,4 +1,6 @@
 
+#pragma once
+
 // Taken from http://www.phy.mtu.edu/~suits/notefreqs.html
 // Rounded to nearest number
 // Format: <note><octave>(sharp/flat)
@@ -17,13 +19,7 @@ enum notetypes{
 
 };
 
-struct Mix_ChunkDeleter {
-    void operator()(Mix_Chunk *chunk) const {
-        if (chunk != nullptr) Mix_FreeChunk(chunk);
-    }
-};
 
-using Mix_ChunkPtr = std::unique_ptr<Mix_Chunk, Mix_ChunkDeleter>;
 
 class songnote{
     bool valid;
@@ -35,7 +31,7 @@ class songnote{
     int durrcount;
     unsigned int playin;
     std::vector<short> buf;
-    Mix_ChunkPtr c;
+    Mix_Chunk *c;
     int channel;
     void randtonegen(short mod, double volume, unsigned int *len,int smode);
     void sqrtonegen(unsigned int freq,  double volume, unsigned int *len,unsigned int duty);
@@ -65,6 +61,24 @@ void tritonegen(unsigned int freq, double volume, unsigned int *len);
     bool isValid(){
         return valid;
     }
+
+    ~songnote(){
+        if(!(c == nullptr)){
+            Mix_FreeChunk(c);
+        }
+    }
+    songnote(const songnote &other)
+        : valid(other.valid),
+          type(other.type),
+          pitch(other.pitch),
+          durr(other.durr),
+          specval(other.specval),
+          vol(other.vol),
+          durrcount(other.durrcount),
+          playin(other.playin),
+          buf(other.buf),
+          c(nullptr),
+          channel(other.channel) {}
     void stop();
     songnote(notetypes atype, unsigned int bpitch,  unsigned int const cdurr, unsigned int dspecval, double evol):durr(cdurr) {
         type=atype;
@@ -75,6 +89,7 @@ void tritonegen(unsigned int freq, double volume, unsigned int *len);
         durrcount=0;
         valid=true;
         playin=0;
+        c = nullptr;
 
     }
     songnote():durr(0){
