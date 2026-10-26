@@ -527,9 +527,10 @@
 	<iostream>
 	<cstdlib>
 
-1792959549source:/home/clement/Desktop/Tetris.game/main.cpp
+1792975108source:/home/clement/Desktop/Tetris.game/main.cpp
 	"notes.hpp"
 	"st_maingame.hpp"
+	"st_titlescreen.hpp"
 	"tetris.hpp"
 	<SDL.h>
 	<SDL_mixer.h>
@@ -543,7 +544,7 @@
 	<ctime>
 	<emscripten.h>
 
-1792969434/home/clement/Desktop/Tetris.game/notes.hpp
+1792970224/home/clement/Desktop/Tetris.game/notes.hpp
 	<SDL_mixer.h>
 	<memory>
 	<vector>
@@ -1048,7 +1049,7 @@
 	"begin_code.h"
 	"close_code.h"
 
-1792969489source:/home/clement/Desktop/Tetris.game/notes.cpp
+1792974373source:/home/clement/Desktop/Tetris.game/notes.cpp
 	"notes.hpp"
 	<iostream>
 	<vector>
@@ -1056,7 +1057,8 @@
 1792959337/home/clement/Desktop/Tetris.game/st_maingame.hpp
 	"game_state.hpp"
 
-1792959331/home/clement/Desktop/Tetris.game/game_state.hpp
+1792975075/home/clement/Desktop/Tetris.game/game_state.hpp
+	<atomic>
 
 1792959334/home/clement/Desktop/Tetris.game/tetris.hpp
 	<SDL.h>
@@ -1065,7 +1067,7 @@
 	<exception>
 	<string>
 
-1792967855source:/home/clement/Desktop/Tetris.game/st_maingame.cpp
+1792970107source:/home/clement/Desktop/Tetris.game/st_maingame.cpp
 	"st_maingame.hpp"
 	<iostream>
 	"notes.hpp"
@@ -1079,4 +1081,14 @@
 	<cstring>
 	<deque>
 	<queue>
+
+1793015426/home/clement/Desktop/Tetris.game/st_titlescreen.hpp
+	"game_state.hpp"
+
+1793015079source:/home/clement/Desktop/Tetris.game/st_titlescreen.cpp
+	"st_titlescreen.hpp"
+	"tetris.hpp"
+	<SDL.h>
+	<SDL_ttf.h>
+	<cmath>
 

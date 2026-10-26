@@ -1,5 +1,6 @@
 #include "notes.hpp"
 #include "st_maingame.hpp"
+#include "st_titlescreen.hpp"
 #include "tetris.hpp"
 #include <SDL.h>
 #include <SDL_mixer.h>
@@ -79,8 +80,8 @@ int main(int argc, char *argv[]) {
 	srand(time(0));
 
 	st_maingame maingame;
-	state_machine sm(&maingame);
-	sm.init();
+	st_titlescreen title(&maingame);
+	state_machine sm;
 
 	SDL msdl(SDL_INIT_VIDEO | SDL_INIT_TIMER);
 
@@ -92,6 +93,8 @@ int main(int argc, char *argv[]) {
 		printf("[ERROR] TTF_OpenFont() Failed with: %s\n", TTF_GetError());
 		exit(2);
 	}
+
+	sm.set_state(&title);
 
 #ifdef EMCXX
 	emscripten_set_main_loop_arg(game_tick, &sm, 60, 1);

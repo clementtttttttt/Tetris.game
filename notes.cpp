@@ -31,6 +31,7 @@ void songnote::randtonegen(short mod, double volume, unsigned int *len,int smode
 
 
 void songnote::play() {
+	stop();
 					playin = 1;
 					durrcount = durr;
 	unsigned int len = 0;

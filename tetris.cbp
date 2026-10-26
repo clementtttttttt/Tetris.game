@@ -51,6 +51,8 @@
 		<Unit filename="tetris.hpp" />
 		<Unit filename="st_maingame.cpp" />
 		<Unit filename="st_maingame.hpp" />
+		<Unit filename="st_titlescreen.cpp" />
+		<Unit filename="st_titlescreen.hpp" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

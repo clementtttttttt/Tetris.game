@@ -1,5 +1,9 @@
 #pragma once
 
+#include <atomic>
+
+class state_machine;
+
 class game_state {
       public:
 	virtual ~game_state() = default;
@@ -7,34 +11,46 @@ class game_state {
 	virtual void frame() = 0;
 	virtual void draw() = 0;
 	virtual void tick() = 0;
+
+	void set_machine(state_machine *machine) { m_machine = machine; }
+
+      protected:
+	state_machine *m_machine = nullptr;
 };
 
 class state_machine {
-	game_state *m_current = nullptr;
+	std::atomic<game_state *> m_current{nullptr};
 
       public:
-	state_machine(game_state *initial = nullptr) : m_current(initial) {}
+	state_machine() = default;
 
-	void set_state(game_state *state) { m_current = state; }
-	game_state *current() const { return m_current; }
-
-	void init() {
-		if (m_current)
-			m_current->init();
+	void set_state(game_state *state) {
+		if (!state) {
+			m_current.store(nullptr);
+			return;
+		}
+		state->set_machine(this);
+		state->init();
+		m_current.store(state);
 	}
 
+	game_state *current() const { return m_current.load(); }
+
 	void frame() {
-		if (m_current)
-			m_current->frame();
+		game_state *state = m_current.load();
+		if (state)
+			state->frame();
 	}
 
 	void draw() {
-		if (m_current)
-			m_current->draw();
+		game_state *state = m_current.load();
+		if (state)
+			state->draw();
 	}
 
 	void tick() {
-		if (m_current)
-			m_current->tick();
+		game_state *state = m_current.load();
+		if (state)
+			state->tick();
 	}
 };
