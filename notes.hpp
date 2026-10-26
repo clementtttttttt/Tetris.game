@@ -25,81 +25,26 @@ class songnote{
     bool valid;
     notetypes type;
     unsigned int pitch;
-    const unsigned int durr ;
+    const unsigned int durr;
     unsigned int specval;
     double vol;
-    int durrcount;
-    unsigned int playin;
-    std::vector<short> buf;
-    Mix_Chunk *c;
-    int channel;
-    void randtonegen(short mod, double volume, unsigned int *len,int smode);
-    void sqrtonegen(unsigned int freq,  double volume, unsigned int *len,unsigned int duty);
-void tritonegen(unsigned int freq, double volume, unsigned int *len);
+    bool legato;
+
     public:
-    bool isNotPlaying(){
-        return playin == 0 && durrcount == 0;
-    }
+    songnote()
+        : valid(false), type(EMPTY), pitch(0), durr(0), specval(0), vol(0.0), legato(false) {}
 
-    bool finishedPlaying(){
-        return durrcount <= 0;
-    }
+    songnote(notetypes atype, unsigned int bpitch, unsigned int const cdurr, unsigned int dspecval, double evol, bool alegato = false)
+        : valid(true), type(atype), pitch(bpitch), durr(cdurr), specval(dspecval), vol(evol), legato(alegato) {}
 
-    bool isPadNote(){
-        return durr <= 0;
-    }
-
-    void tick(){
-        if (isNotPlaying()) {
-			play();
-		}
-        durrcount -= 2;
-        if(finishedPlaying()){
-            stop();
-        }
-    }
-    bool isValid(){
-        return valid;
-    }
-
-    ~songnote(){
-        if(!(c == nullptr)){
-            Mix_FreeChunk(c);
-        }
-    }
-    songnote(const songnote &other)
-        : valid(other.valid),
-          type(other.type),
-          pitch(other.pitch),
-          durr(other.durr),
-          specval(other.specval),
-          vol(other.vol),
-          durrcount(other.durrcount),
-          playin(other.playin),
-          buf(other.buf),
-          c(nullptr),
-          channel(other.channel) {}
-    void stop();
-    songnote(notetypes atype, unsigned int bpitch,  unsigned int const cdurr, unsigned int dspecval, double evol):durr(cdurr) {
-        type=atype;
-        pitch=bpitch;
-        specval=dspecval;
-        vol=evol;
-
-        durrcount=0;
-        valid=true;
-        playin=0;
-        c = nullptr;
-
-    }
-    songnote():durr(0){
-        songnote(EMPTY,0,0,0,0);
-        valid=false;
-
-
-    }
-    void play();
-
+    bool isValid() const { return valid; }
+    bool isPadNote() const { return durr <= 0; }
+    bool isLegato() const { return legato; }
+    notetypes getType() const { return type; }
+    unsigned int getPitch() const { return pitch; }
+    unsigned int getDurr() const { return durr; }
+    unsigned int getSpecval() const { return specval; }
+    double getVol() const { return vol; }
 };
 
 #define C0     16

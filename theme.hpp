@@ -2,11 +2,15 @@
 
 #include "bgm.hpp"
 
+class mixer;
+
 class theme : public bgm {
       public:
 	theme() = default;
 	theme(const theme &) = delete;
 	theme &operator=(const theme &) = delete;
+
+	void set_mixer(mixer &audio) { m_mixer = &audio; }
 
 	void tick() override;
 	void stop() override;
@@ -15,7 +19,9 @@ class theme : public bgm {
 	void set_paused(bool paused) override;
 
       private:
-	int m_rows[4] = {0, 0, 0, 0};
+	mixer *m_mixer = nullptr;
+	int m_row[4] = {0, 0, 0, 0};
+	int m_remaining[4] = {0, 0, 0, 0};
 	bool m_stopped = false;
 	bool m_paused = false;
 };

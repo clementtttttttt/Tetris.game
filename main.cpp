@@ -1,4 +1,6 @@
+#include "mixer.hpp"
 #include "notes.hpp"
+#include "sound_effects.hpp"
 #include "st_maingame.hpp"
 #include "st_titlescreen.hpp"
 #include "tetris.hpp"
@@ -85,6 +87,9 @@ int main(int argc, char *argv[]) {
 
 	srand(time(0));
 
+	mixer audio_mixer;
+	sound_effects sfx(audio_mixer);
+
 	st_maingame maingame;
 	st_titlescreen title(&maingame);
 	state_machine sm;
@@ -100,6 +105,9 @@ int main(int argc, char *argv[]) {
 		exit(2);
 	}
 
+	st_maingame_bind_audio(audio_mixer, sfx);
+	audio_mixer.start();
+
 	sm.set_state(&title);
 
 #ifdef EMCXX
@@ -110,6 +118,8 @@ int main(int argc, char *argv[]) {
 		game_tick(&sm);
 	}
 #endif
+
+	audio_mixer.stop();
 
 	TTF_CloseFont(font);
 

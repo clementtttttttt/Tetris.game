@@ -55,6 +55,8 @@
 		<Unit filename="st_titlescreen.hpp" />
 		<Unit filename="sound_effects.cpp" />
 		<Unit filename="sound_effects.hpp" />
+		<Unit filename="mixer.cpp" />
+		<Unit filename="mixer.hpp" />
 		<Unit filename="bgm.hpp" />
 		<Unit filename="theme.cpp" />
 		<Unit filename="theme.hpp" />

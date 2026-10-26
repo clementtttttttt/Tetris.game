@@ -1,5 +1,6 @@
 #include "st_maingame.hpp"
 #include <iostream>
+#include "mixer.hpp"
 #include "notes.hpp"
 #include "sound_effects.hpp"
 #include "theme.hpp"
@@ -68,7 +69,13 @@ static int score = 0, level = 1;
 
 static int fly[4];
 
-static void s_beep(float len_ims, unsigned int freq, unsigned int channel = 0, double vol = 0.5) { sound_effects::instance().play(len_ims, freq, channel, vol); }
+static mixer *g_mixer = nullptr;
+static sound_effects *g_sfx = nullptr;
+
+static void s_beep(float len_ims, unsigned int freq, unsigned int channel = 0, double vol = 0.5, bool legato=false) {
+	if (g_sfx)
+		g_sfx->play(len_ims, freq, channel, vol,legato);
+}
 static int clearing = 0;
 static int played_p = 0, played_s = 0;
 
@@ -106,19 +113,25 @@ static void f_update() {
 	lines += filledlines;
 	if (fill_score_sum == 700) {
 		fill_score_sum = 800;
-		s_beep(100, C4);
-		s_beep(100, E4);
-		s_beep(100, G4);
-		s_beep(200, C5);
+		s_beep(100, C5);
+		s_beep(100, E5);
+		s_beep(100, G5);
+		s_beep(200, C6);
 	} else if (filledlines) {
-		s_beep(100, C4);
-		s_beep(100, E4);
-		s_beep(100, G4);
+		s_beep(100, C5);
+		s_beep(100, E5);
+		s_beep(100, G5);
 	}
 	score += fill_score_sum;
 }
 
 static theme background_music;
+
+void st_maingame_bind_audio(mixer &audio, sound_effects &sfx) {
+	g_mixer = &audio;
+	g_sfx = &sfx;
+	background_music.set_mixer(audio);
+}
 
 static void drawText(SDL_Renderer *screen, char *str, int x, int y, int sz, SDL_Color fgC, SDL_Color bgC, int leftanchor) {
 
@@ -520,11 +533,11 @@ static void rotate_piece(int left) {
 	}
 
 	movep(px, py, px, py);
-	s_beep(50, C5);
-	s_beep(50, C4);
-	s_beep(50, A4);
-	s_beep(50, B4);
-	s_beep(50, C5);
+	s_beep(30, C6,0,0.5,true);
+	s_beep(30, C5,0,0.5,true);
+	s_beep(30, A5,0,0.5,true);
+	s_beep(30, B5,0,0.5,true);
+	s_beep(30, C6,0,0.5,true);
 	ghost_tick();
 }
 
@@ -532,7 +545,7 @@ static void key_move_piece(int oldx, int oldy, int newx, int newy) {
 	if (chk_collision(newx - oldx, newy - oldy)) {
 		return;
 	}
-	s_beep(50, C4);
+	s_beep(50, C5,0,0.5,true);
 
 	px = newx;
 	py = newy;
@@ -569,12 +582,12 @@ static void drop_tick() {
 			spawn = 1;
 			movep(px, py, px, py);
 			if(!harddropped){
-                s_beep(100, C2, 3, 0.9);
+                s_beep(100, C3, 3, 0.9);
 			}
             else{
-                s_beep(50, A1, 3, 0.9);
-                s_beep(50, B1, 3, 0.9);
-                s_beep(50, C2, 3, 0.9);
+                s_beep(50, A2, 3, 0.9,true);
+                s_beep(50, B2, 3, 0.9,true);
+                s_beep(50, C3, 3, 0.9);
             }
 
 			f_update();
@@ -594,7 +607,8 @@ static int w_up = 1, q_up = 1;
 
 
 static void audio_tick() {
-	sound_effects::instance().tick();
+	if (g_sfx)
+		g_sfx->tick();
 	background_music.tick();
 }
 static int audioFrameCount = 0;
@@ -675,11 +689,12 @@ void st_maingame::tick() {
                     if(!pause){
                         pause=1;
                         background_music.set_paused(true);
-                        Mix_HaltChannel(-1);
-                        s_beep(90,C5,1,0.2);
+                        if (g_mixer)
+                            g_mixer->stop_all();
                         s_beep(90,C6,1,0.2);
-                        s_beep(90,C5,1,0.2);
+                        s_beep(90,C7,1,0.2);
                         s_beep(90,C6,1,0.2);
+                        s_beep(90,C7,1,0.2);
 
                     }
                     else{
@@ -713,11 +728,11 @@ void st_maingame::tick() {
 
 		if (lines >= goal) {
 			++level;
-			s_beep(100, A5, 2);
-			s_beep(100, C6S, 2);
-			s_beep(100, E6, 2);
-			s_beep(100, A6, 2);
-			s_beep(100, A5, 2);
+			s_beep(100, A6, 2,0.5,false);
+			s_beep(100, C7S, 2,0.5,false);
+			s_beep(100, E7, 2,0.5,false);
+			s_beep(100, A7, 2,0.5,false);
+			s_beep(100, A6, 2,0.5,false);
 
 			prevgoal = goal;
 		}

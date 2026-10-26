@@ -177,11 +177,11 @@ void st_titlescreen::draw() {
 		float z = radius * cos_a;
 		float distance = camera - z;
 		float scale = focal / distance;
-		float x = radius * sin_a * 1.5f;
+		float x = radius * sin_a ;
 
 		items[i].depth = z;
 		items[i].scale = scale;
-		items[i].screen_x = center_x + x * scale;
+		items[i].screen_x = center_x + x * scale* 1.5f;
 		items[i].screen_y = center_y + z * tilt * scale;
 		items[i].glyph = title_text[i];
 

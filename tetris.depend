@@ -527,8 +527,10 @@
 	<iostream>
 	<cstdlib>
 
-1793018639source:/home/clement/Desktop/Tetris.game/main.cpp
+1793040986source:/home/clement/Desktop/Tetris.game/main.cpp
+	"mixer.hpp"
 	"notes.hpp"
+	"sound_effects.hpp"
 	"st_maingame.hpp"
 	"st_titlescreen.hpp"
 	"tetris.hpp"
@@ -544,7 +546,7 @@
 	<ctime>
 	<emscripten.h>
 
-1793020687/home/clement/Desktop/Tetris.game/notes.hpp
+1793042966/home/clement/Desktop/Tetris.game/notes.hpp
 	<SDL_mixer.h>
 	<memory>
 	<vector>
@@ -1049,12 +1051,10 @@
 	"begin_code.h"
 	"close_code.h"
 
-1793032478source:/home/clement/Desktop/Tetris.game/notes.cpp
+1793040889source:/home/clement/Desktop/Tetris.game/notes.cpp
 	"notes.hpp"
-	<iostream>
-	<vector>
 
-1792959337/home/clement/Desktop/Tetris.game/st_maingame.hpp
+1793040940/home/clement/Desktop/Tetris.game/st_maingame.hpp
 	"game_state.hpp"
 
 1792975075/home/clement/Desktop/Tetris.game/game_state.hpp
@@ -1067,9 +1067,10 @@
 	<exception>
 	<string>
 
-1793029929source:/home/clement/Desktop/Tetris.game/st_maingame.cpp
+1793043214source:/home/clement/Desktop/Tetris.game/st_maingame.cpp
 	"st_maingame.hpp"
 	<iostream>
+	"mixer.hpp"
 	"notes.hpp"
 	"sound_effects.hpp"
 	"theme.hpp"
@@ -1087,7 +1088,7 @@
 1793015426/home/clement/Desktop/Tetris.game/st_titlescreen.hpp
 	"game_state.hpp"
 
-1793017232source:/home/clement/Desktop/Tetris.game/st_titlescreen.cpp
+1793040479source:/home/clement/Desktop/Tetris.game/st_titlescreen.cpp
 	"st_titlescreen.hpp"
 	"tetris.hpp"
 	<SDL.h>
@@ -1095,20 +1096,29 @@
 	<cmath>
 	<cstring>
 
-1793020407source:/home/clement/Desktop/Tetris.game/sound_effects.cpp
+1793043260source:/home/clement/Desktop/Tetris.game/sound_effects.cpp
 	"sound_effects.hpp"
+	"mixer.hpp"
 
-1793019402/home/clement/Desktop/Tetris.game/sound_effects.hpp
+1793043253/home/clement/Desktop/Tetris.game/sound_effects.hpp
 	"notes.hpp"
 	<queue>
 
-1793025246/home/clement/Desktop/Tetris.game/theme.hpp
+1793040915/home/clement/Desktop/Tetris.game/theme.hpp
 	"bgm.hpp"
 
 1793025246/home/clement/Desktop/Tetris.game/bgm.hpp
 
-1793025544source:/home/clement/Desktop/Tetris.game/theme.cpp
+1793042357source:/home/clement/Desktop/Tetris.game/theme.cpp
 	"theme.hpp"
+	"mixer.hpp"
 	"notes.hpp"
+
+1793040895/home/clement/Desktop/Tetris.game/mixer.hpp
+	"notes.hpp"
+	<mutex>
+
+1793042981source:/home/clement/Desktop/Tetris.game/mixer.cpp
+	"mixer.hpp"
 	<SDL_mixer.h>
 
