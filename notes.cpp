@@ -31,6 +31,9 @@ void songnote::randtonegen(short mod, double volume, unsigned int *len,int smode
 
 
 void songnote::play() {
+    if(!isValid()){
+        return;
+    }
 	stop();
 					playin = 1;
 					durrcount = durr;
@@ -93,8 +96,11 @@ void songnote::stop(){
 
             playin=0;
             durrcount=0;
-            Mix_FreeChunk(c);
-            c = nullptr;
+            if(!(c == nullptr)){
+                Mix_FreeChunk(c);
+                            c = nullptr;
+
+            }
             buf.clear();
 }
 
